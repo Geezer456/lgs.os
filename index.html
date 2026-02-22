@@ -9,7 +9,7 @@
             --primary: #ff8800;
             --primary-glow: rgba(255, 136, 0, 0.6);
             --bg: #050505;
-            --card: #111;
+            --card: rgba(20, 20, 20, 0.6); /* GRİ YERİNE ŞEFFAF YAPTIK */
             --text: #ddd;
             --accent: #00ff88;
             --header-bg: #000;
@@ -26,14 +26,18 @@
         * { box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', sans-serif;
-            background-color: var(--bg);
+            background-color: #050505; /* Ana arka plan rengi */
+            /* Kareli arka plan deseni aşağıda */
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px; /* Karelerin büyüklüğü */
             color: var(--text);
-            margin: 0;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
-            overflow-y: auto;
-            transition: 0.3s;
+            height: 100vh;
+            overflow: hidden;
+        transition: 0.3s;
         }
         .top-header {
             width: 100%; height: 60px;
@@ -85,10 +89,45 @@
         input[type="text"], input[type="number"], select { background: #000; border: 1px solid #333; color: #fff; padding: 6px; font-size: 11px; }
         .boss-btn { border-color: var(--danger); color: var(--danger); }
         .boss-btn:hover { background: var(--danger); color: #fff; box-shadow: 0 0 10px var(--danger); }
+        .task-item { animation: fadeInUp 0.4s ease both; }
         .status-footer-bar { display: flex; flex-direction: column; gap: 8px; background: var(--card); padding: 12px 20px; border: 2px solid #222; margin-top: auto; transition: all 0.3s ease; }
         .status-footer-bar:hover { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow), inset 0 0 10px var(--primary-glow); }
         .lgs-bar-bg { width: 100%; height: 10px; background: #222; border-radius: 5px; overflow: hidden; border: 1px solid #333; }
         #lgs-bar-fill { height: 100%; background: var(--primary); transition: 0.5s; width: 100%; box-shadow: 0 0 5px var(--primary); }
+        /* Süzülme efektinin motoru */
+        @keyframes fadeInUp { 
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            } 
+            to {
+                opacity: 1;
+                transform: translateY(0);
+        } 
+    }
+        /* Kutuları şeffaf ve buzlu cam gibi yapar */
+        .header-stats, .lvl-box, .rank-tag, .ach-box {
+            background: var(--card) !important;
+            backdrop-filter: blur(10px); /* Arkadaki kareleri bulanık gösterir */
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        }
+        /* 1. Ana Panelleri Süzülmeye Programla */
+        .left-panel, .right-panel, .status-footer-bar {
+            animation: fadeInUp 0.6s ease both;
+        }
+
+        /* 2. Domino Etkisi (Sırayla Geliş) */
+        .left-panel { animation-delay: 0.1s; }
+        .right-panel { animation-delay: 0.2s; }
+        .status-footer-bar { animation-delay: 0.3s; }
+
+/* 3. İçerideki Küçük Kutuların Sırayla Gelmesi (Opsiyonel ama çok şık durur) */
+        .weekly-plan-container { animation: fadeInUp 0.5s ease both; animation-delay: 0.4s; }
+        .daily-todo { animation: fadeInUp 0.5s ease both; animation-delay: 0.5s; }
+        .top-row > div:nth-child(1) { animation: fadeInUp 0.5s ease both; animation-delay: 0.6s; }
+        .top-row > div:nth-child(2) { animation: fadeInUp 0.5s ease both; animation-delay: 0.7s; }
+        .tasks-box { animation: fadeInUp 0.5s ease both; animation-delay: 0.8s; }
+}
     </style>
 </head>
 <body id="mainBody">

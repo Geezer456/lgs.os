@@ -5,12 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MEB Konu Takip · LGS.OS</title>
     <style>
-        :root { --primary:#ff8800; --primary-glow:rgba(255,136,0,0.6); --bg:#050505; --card:#111; --text:#ddd; --accent:#00ff88; --header-bg:#000; --danger:#ff3333; --mc-green:#55ff55; --mc-green-glow:rgba(85,255,85,0.8); --mc-purple:#aa00ff; --mc-gold:#ffaa00; }
+        :root { --primary:#ff8800; --primary-glow:rgba(255,136,0,0.6); --bg:#050505; --card: rgba(15, 15, 15, 0.6); /* Şeffaf koyu gri */; --text:#ddd; --accent:#00ff88; --header-bg:#000; --danger:#ff3333; --mc-green:#55ff55; --mc-green-glow:rgba(85,255,85,0.8); --mc-purple:#aa00ff; --mc-gold:#ffaa00; }
         body.theme-cyan   { --primary:#00f2ff; --primary-glow:rgba(0,242,255,0.6); }
         body.theme-purple { --primary:#bc13fe; --primary-glow:rgba(188,19,254,0.6); }
         body.theme-green  { --primary:#39ff14; --primary-glow:rgba(57,255,20,0.6); }
         * { box-sizing:border-box; }
-        body { font-family:'Segoe UI',sans-serif; background-color:var(--bg); color:var(--text); margin:0; display:flex; flex-direction:column; min-height:100vh; overflow-y:auto; transition:background-color 0.3s,color 0.3s; }
+        body {
+            background-color: #050505;
+            /* Kareli Arka Plan Deseni */
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+    
+            /* ESKİ YAZI STİLİNİ GERİ GETİREN SATIR */
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text);
+            margin: 0; /* Sayfa kenarlarındaki boşluğu sıfırlar */
+}    
         .top-header { width:100%; height:60px; background-color:var(--header-bg); border-bottom:2px solid #222; display:flex; align-items:center; justify-content:space-between; padding:0 20px; position:sticky; top:0; z-index:1000; }
         .logo { color:var(--primary); font-weight:bold; font-size:20px; letter-spacing:2px; text-shadow:0 0 10px var(--primary-glow); }
         .header-stats { display:flex; align-items:center; gap:12px; width:380px; }
@@ -68,6 +80,15 @@
         .status-mini-bar span { color:var(--primary); font-weight:bold; }
         @keyframes fadeInUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
         @media(max-width:768px) { .meb-grid{grid-template-columns:1fr} }
+
+        /* Her sayfadaki kutucukları şeffaf ve buzlu cam yapar */
+        .lvl-box, .header-stats, .ach-box, .task-item, .deneme-card, .market-item, .meb-konu-box {
+            background: var(--card) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px); /* Safari desteği için */
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
     </style>
 </head>
 <body id="mainBody">

@@ -7,7 +7,7 @@
     <style>
         :root {
             --primary: #ff8800; --primary-glow: rgba(255,136,0,0.6);
-            --bg: #050505; --card: #111; --text: #ddd; --accent: #00ff88;
+            --bg: #050505; --card: rgba(15, 15, 15, 0.6); --text: #ddd; --accent: #00ff88;
             --header-bg: #000; --danger: #ff3333;
             --mc-green: #55ff55; --mc-green-glow: rgba(85,255,85,0.8);
             --mc-purple: #aa00ff; --mc-gold: #ffaa00;
@@ -16,7 +16,19 @@
         body.theme-purple { --primary:#bc13fe; --primary-glow:rgba(188,19,254,0.6); }
         body.theme-green  { --primary:#39ff14; --primary-glow:rgba(57,255,20,0.6); }
         * { box-sizing:border-box; }
-        body { font-family:'Segoe UI',sans-serif; background-color:var(--bg); color:var(--text); margin:0; display:flex; flex-direction:column; min-height:100vh; overflow-y:auto; transition:0.3s; }
+        body {
+            background-color: #050505;
+            /* Kareli Arka Plan Deseni */
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+    
+            /* ESKİ YAZI STİLİNİ GERİ GETİREN SATIR */
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text);
+            margin: 0; /* Sayfa kenarlarındaki boşluğu sıfırlar */
+}
         .top-header { width:100%; height:60px; background-color:var(--header-bg); border-bottom:2px solid #222; display:flex; align-items:center; justify-content:space-between; padding:0 20px; position:sticky; top:0; z-index:1000; }
         .logo { color:var(--primary); font-weight:bold; font-size:20px; letter-spacing:2px; text-shadow:0 0 10px var(--primary-glow); }
         .header-stats { display:flex; align-items:center; gap:12px; width:380px; }
@@ -73,7 +85,36 @@
         .status-mini-bar span { color:var(--primary); font-weight:bold; }
         .xp-toast { position:fixed; bottom:30px; right:30px; background:#000; border:2px solid var(--accent); color:var(--accent); padding:12px 20px; border-radius:12px; font-weight:bold; font-size:14px; box-shadow:0 0 20px rgba(0,255,136,0.4); z-index:9999; opacity:0; transform:translateY(20px); transition:opacity 0.3s,transform 0.3s; pointer-events:none; }
         .xp-toast.show { opacity:1; transform:translateY(0); }
+        .task-item { animation: fadeInUp 0.4s ease both; }
+        /* Deneme giriş panelini süzerek getir */
+        .analiz-container {
+            animation: fadeInUp 0.5s ease both;
+}
         @media(max-width:800px) { .deneme-grid{grid-template-columns:repeat(2,1fr)} .deneme-stats{grid-template-columns:repeat(3,1fr)} }
+        /* Her sayfadaki kutucukları şeffaf ve buzlu cam yapar */
+        .lvl-box, .header-stats, .ach-box, .task-item, .deneme-card, .market-item, .meb-konu-box {
+            background: var(--card) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px); /* Safari desteği için */
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+        /* Süzülme efektinin motoru */
+        @keyframes fadeInUp { 
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            } 
+            to {
+                opacity: 1;
+                transform: translateY(0);
+    } 
+}
+        /* Deneme geçmişi kartları sırayla gelsin */
+        .deneme-card:nth-child(1) { animation-delay: 0.2s; }
+        .deneme-card:nth-child(2) { animation-delay: 0.3s; }
+        .deneme-card:nth-child(3) { animation-delay: 0.4s; }
+        .deneme-card:nth-child(4) { animation-delay: 0.5s; }
     </style>
 </head>
 <body id="mainBody">
