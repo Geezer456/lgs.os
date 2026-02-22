@@ -25,20 +25,17 @@
 
         * { box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #050505; /* Ana arka plan rengi */
-            /* Kareli arka plan deseni aşağıda */
+            background-color: #050505;
             background-image: 
                 linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 40px 40px; /* Karelerin büyüklüğü */
+            background-size: 40px 40px;
+    
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: var(--text);
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        transition: 0.3s;
-        }
+            margin: 0;
+            /* 100vh ve overflow:hidden satırlarını sildik, artık sayfa rahatça akar */
+}
         .top-header {
             width: 100%; height: 60px;
             background-color: var(--header-bg);
