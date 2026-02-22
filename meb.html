@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEB Konu Takip · LGS.OS</title>
+    <style>
+        :root { --primary:#ff8800; --primary-glow:rgba(255,136,0,0.6); --bg:#050505; --card:#111; --text:#ddd; --accent:#00ff88; --header-bg:#000; --danger:#ff3333; --mc-green:#55ff55; --mc-green-glow:rgba(85,255,85,0.8); --mc-purple:#aa00ff; --mc-gold:#ffaa00; }
+        body.theme-cyan   { --primary:#00f2ff; --primary-glow:rgba(0,242,255,0.6); }
+        body.theme-purple { --primary:#bc13fe; --primary-glow:rgba(188,19,254,0.6); }
+        body.theme-green  { --primary:#39ff14; --primary-glow:rgba(57,255,20,0.6); }
+        * { box-sizing:border-box; }
+        body { font-family:'Segoe UI',sans-serif; background-color:var(--bg); color:var(--text); margin:0; display:flex; flex-direction:column; min-height:100vh; overflow-y:auto; transition:background-color 0.3s,color 0.3s; }
+        .top-header { width:100%; height:60px; background-color:var(--header-bg); border-bottom:2px solid #222; display:flex; align-items:center; justify-content:space-between; padding:0 20px; position:sticky; top:0; z-index:1000; }
+        .logo { color:var(--primary); font-weight:bold; font-size:20px; letter-spacing:2px; text-shadow:0 0 10px var(--primary-glow); }
+        .header-stats { display:flex; align-items:center; gap:12px; width:380px; }
+        .lvl-box { font-weight:bold; color:var(--primary); font-size:14px; }
+        .header-xp-container { flex:1; height:10px; background:#222; border-radius:5px; overflow:hidden; border:1px solid #333; }
+        #header-xp-bar { height:100%; background:var(--primary); width:0%; transition:width 0.5s ease; box-shadow:0 0 8px var(--primary); }
+        .rank-tag { font-size:10px; background:var(--primary); color:#000; padding:2px 6px; border-radius:4px; font-weight:bold; white-space:nowrap; }
+        button, .nav-link { padding:6px 10px; font-size:10px; border:1px solid var(--primary); background:transparent; color:var(--primary); cursor:pointer; font-weight:bold; transition:0.3s; border-radius:12px !important; text-decoration:none; display:inline-block; line-height:normal; white-space:nowrap; }
+        button:hover, .nav-link:hover { background:var(--primary); color:#000; box-shadow:0 0 8px var(--primary-glow); }
+        .nav-link.active-page { background:var(--primary); color:#000; box-shadow:0 0 10px var(--primary-glow); }
+        .nav-link.achievements-link { border-color:var(--mc-green); color:var(--mc-green); box-shadow:0 0 10px var(--mc-green-glow); }
+        .nav-link.achievements-link:hover { background:var(--mc-green); color:#000; }
+        input[type="text"],input[type="number"],select { background:#000; border:1px solid #333; color:#fff; padding:6px; font-size:11px; border-radius:12px !important; }
+        .page-content { padding:25px 20px; flex:1; }
+        .page-header { text-align:center; margin-bottom:25px; position:relative; }
+        .page-title { font-size:26px; font-weight:bold; color:var(--primary); text-shadow:0 0 15px var(--primary-glow),0 0 30px var(--primary-glow); letter-spacing:3px; margin:0 0 6px 0; }
+        .page-subtitle { color:#555; font-size:11px; margin:0; letter-spacing:1px; }
+        .overall-progress-bar { max-width:600px; margin:15px auto 0; background:#111; border:2px solid #222; border-radius:12px; padding:12px 18px; transition:all 0.3s; }
+        .overall-progress-bar:hover { border-color:var(--primary); box-shadow:0 0 10px var(--primary-glow),inset 0 0 10px var(--primary-glow); }
+        .overall-bar-row { display:flex; align-items:center; gap:12px; }
+        .overall-bar-bg { flex:1; height:12px; background:#000; border-radius:6px; overflow:hidden; border:1px solid #333; }
+        #overall-bar-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--accent)); width:0%; transition:width 0.6s ease; box-shadow:0 0 8px var(--primary); }
+        .overall-stats-text { font-size:11px; color:var(--primary); font-weight:bold; white-space:nowrap; }
+        .meb-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-top:20px; }
+        .ders-block { background:var(--card); border:2px solid #222; border-radius:12px; padding:20px; transition:all 0.3s ease; position:relative; overflow:hidden; animation:fadeInUp 0.4s ease both; }
+        .ders-block::before { content:attr(data-icon); position:absolute; right:15px; top:50%; transform:translateY(-50%); font-size:80px; opacity:0.04; pointer-events:none; user-select:none; }
+        .ders-block:hover { border-color:var(--primary); box-shadow:0 0 14px var(--primary-glow),inset 0 0 14px var(--primary-glow); }
+        .ders-block:nth-child(1){animation-delay:0.05s} .ders-block:nth-child(2){animation-delay:0.10s} .ders-block:nth-child(3){animation-delay:0.15s} .ders-block:nth-child(4){animation-delay:0.20s} .ders-block:nth-child(5){animation-delay:0.25s} .ders-block:nth-child(6){animation-delay:0.30s}
+        .ders-title-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+        .ders-icon { font-size:22px; }
+        .ders-title { font-size:15px; font-weight:bold; color:var(--primary); text-shadow:0 0 8px var(--primary-glow); letter-spacing:1px; flex:1; }
+        .ders-xp-badge { font-size:9px; background:rgba(255,136,0,0.15); border:1px solid var(--primary); color:var(--primary); padding:3px 8px; border-radius:20px; font-weight:bold; }
+        .progress-bar-container { width:100%; height:7px; background:#000; border-radius:4px; overflow:hidden; margin-bottom:8px; border:1px solid #1a1a1a; }
+        .progress-bar-fill { height:100%; background:var(--primary); transition:width 0.5s ease; box-shadow:0 0 8px var(--primary-glow); }
+        .progress-text { text-align:center; font-size:10px; color:#555; margin-bottom:14px; }
+        .konular-wrapper { display:flex; flex-direction:column; gap:7px; }
+        .konu-item { background:#0a0a0a; border:1px solid #1e1e1e; border-radius:9px; padding:9px 11px; transition:all 0.2s; }
+        .konu-item:hover { border-color:#333; }
+        .konu-item.completed { border-color:var(--primary); background:rgba(255,136,0,0.07); box-shadow:0 0 8px var(--primary-glow); }
+        .konu-name-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:7px; }
+        .konu-name { font-size:11px; color:#aaa; font-weight:500; }
+        .konu-item.completed .konu-name { color:var(--primary); }
+        .konu-xp-earned { font-size:9px; color:var(--accent); font-weight:bold; display:none; }
+        .konu-item.completed .konu-xp-earned { display:inline; }
+        .tick-row { display:flex; gap:6px; flex-wrap:wrap; }
+        .tick-box { display:flex; align-items:center; gap:4px; font-size:9px; color:#555; cursor:pointer; transition:0.2s; user-select:none; padding:3px 7px; border-radius:20px; border:1px solid #222; background:#000; }
+        .tick-box:hover { color:var(--primary); border-color:var(--primary); }
+        .tick-box.checked { color:var(--primary); border-color:var(--primary); background:rgba(255,136,0,0.1); }
+        .tick-box input[type="checkbox"] { appearance:none; width:11px; height:11px; border:1px solid #444; border-radius:3px; background:#000; cursor:pointer; transition:0.2s; position:relative; flex-shrink:0; }
+        .tick-box input[type="checkbox"]:checked { background:var(--primary); border-color:var(--primary); box-shadow:0 0 6px var(--primary-glow); }
+        .tick-box input[type="checkbox"]:checked::after { content:'✓'; position:absolute; top:-2px; left:1px; font-size:9px; color:#000; font-weight:bold; }
+        .xp-toast { position:fixed; bottom:30px; right:30px; background:#000; border:2px solid var(--primary); color:var(--primary); padding:12px 20px; border-radius:12px; font-weight:bold; font-size:14px; box-shadow:0 0 20px var(--primary-glow); z-index:9999; opacity:0; transform:translateY(20px); transition:opacity 0.3s,transform 0.3s; pointer-events:none; }
+        .xp-toast.show { opacity:1; transform:translateY(0); }
+        .status-mini-bar { background:#000; border-top:2px solid #1a1a1a; padding:8px 20px; display:flex; justify-content:space-between; align-items:center; font-size:10px; color:#444; }
+        .status-mini-bar span { color:var(--primary); font-weight:bold; }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+        @media(max-width:768px) { .meb-grid{grid-template-columns:1fr} }
+    </style>
+</head>
+<body id="mainBody">
+    <header class="top-header">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div class="logo">⚡ LGS.OS</div>
+            <a class="nav-link" href="index.html">🏠 ANA SAYFA</a>
+            <button onclick="cycleTheme()">TEMA</button>
+            <a class="nav-link active-page" href="meb.html">📚 MEB KONU</a>
+            <a class="nav-link" href="deneme.html">📊 DENEME</a>
+            <a class="nav-link" href="hiz.html">⚡ HIZ MODU</a>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <a class="nav-link achievements-link" href="achievements.html">🏆 BAŞARIMLAR</a>
+            <div class="header-stats">
+                <span class="rank-tag" id="rank-name">ÇAYLAK</span>
+                <div class="lvl-box">LVL <span id="level">1</span></div>
+                <div class="header-xp-container"><div id="header-xp-bar"></div></div>
+                <div style="font-size:11px;color:var(--primary);font-weight:bold;"><span id="xp-balance">0</span> XP</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-content">
+        <div class="page-header">
+            <h2 class="page-title">📚 MEB KONU TAKİP</h2>
+            <p class="page-subtitle">Konu → Tekrar → Test → Deneme &nbsp;|&nbsp; Her tamamlanan konu: <span style="color:var(--primary);">+10 XP</span></p>
+            <div class="overall-progress-bar">
+                <div class="overall-bar-row">
+                    <div style="font-size:10px;color:#666;white-space:nowrap;">GENEL İLERLEME</div>
+                    <div class="overall-bar-bg"><div id="overall-bar-fill"></div></div>
+                    <div class="overall-stats-text" id="overall-stats-text">0 / 0</div>
+                </div>
+            </div>
+        </div>
+        <div class="meb-grid" id="meb-grid"></div>
+    </div>
+
+    <div class="status-mini-bar">
+        <div>LGS.OS &nbsp;·&nbsp; MEB KONU TAKİP MODÜLÜ</div>
+        <div>LGS: <span id="lgs-days-mini">---</span> GÜN KALDI</div>
+    </div>
+    <div class="xp-toast" id="xp-toast">⚡ +10 XP KAZANILDI!</div>
+
+    <script>
+        /* ── VERİ ─────────────────────────────────────────── */
+        const STORAGE_KEY = 'LGS_GAMER_OS_DATA';
+        function loadData() {
+            try { const r=localStorage.getItem(STORAGE_KEY); if(r) return JSON.parse(r); } catch(e) {}
+            return { xpTotal:0,xpBalance:0,themeIdx:0,tasks:[],todos:[],planData:{},mebData:{},denemeler:[],hizHistory:[],hizSorular:Array(40).fill('bos'),achievements:{},visitedPages:[] };
+        }
+        function saveData(d) { localStorage.setItem(STORAGE_KEY,JSON.stringify(d)); }
+        let appData = loadData();
+        if (!appData.achievements) appData.achievements = {};
+        if (!appData.mebData)      appData.mebData = {};
+        if (!appData.visitedPages) appData.visitedPages = [];
+
+        /* ── ACHIEVEMENT ENGINE ───────────────────────────── */
+        const ACH_XP = {'crafting-table':10,'stone-age':20,'iron-armor':30,'diamond-ore':50,'enchanting':75,'dragon-breath':100,'speedrunner':40,'invis-potion':60,'firin-ustasi':15,'potion-master':35,'trade-center':50,'haritaci':25,'redstone-eng':30,'beacon-light':80,'villager-friend':25,'world-traveler':20,'monster-hunter':20,'wither-slayer':60,'hardcore-mode':90,'lgs-slayer':200,'redstone-math':40,'enchant-translator':45,'brewing-science':25,'ancient-history':80,'wandering-english':20,'totem-religion':40,'speed-potion-2':15,'mending-book':35,'phantom-hunter':50,'sunrise-clock':20,'mining-fatigue':70,'respawn-anchor':45,'emerald-block':90,'item-frame':20,'dye-crafter':25,'unbreaking-3':100,'the-void':30,'netherite-upgrade':60,'warden-slayer':85,'elytra-flight':50,'campfire-rest':25,'clock-sync':40,'spyglass-focus':45,'glowstone-night':55,'slimeball-stuck':10,'observer-stats':20,'golden-apple':40,'enchanted-apple':100,'shield-defense':35,'anvil-repair':40,'compass-nav':25,'shulker-box':20,'note-block':15,'command-block':15,'jukebox-party':30,'bookshelf-meb':90,'ender-pearl':70,'chorus-fruit':35,'trident-loyalty':120,'nether-star':150};
+        const ACH_DEPS = {'crafting-table':null,'stone-age':'crafting-table','iron-armor':'stone-age','diamond-ore':'iron-armor','enchanting':'diamond-ore','dragon-breath':'enchanting','speedrunner':'iron-armor','invis-potion':'speedrunner','firin-ustasi':'crafting-table','potion-master':'firin-ustasi','trade-center':'potion-master','haritaci':'crafting-table','redstone-eng':'haritaci','beacon-light':'redstone-eng','villager-friend':'beacon-light','world-traveler':'villager-friend','monster-hunter':'crafting-table','wither-slayer':'monster-hunter','hardcore-mode':'wither-slayer','lgs-slayer':'dragon-breath','redstone-math':'stone-age','enchant-translator':'stone-age','brewing-science':'potion-master','ancient-history':'dragon-breath','wandering-english':'haritaci','totem-religion':'dragon-breath','speed-potion-2':'speedrunner','mending-book':'speedrunner','phantom-hunter':'invis-potion','sunrise-clock':'villager-friend','mining-fatigue':'invis-potion','respawn-anchor':'diamond-ore','emerald-block':'trade-center','item-frame':'firin-ustasi','dye-crafter':'haritaci','unbreaking-3':'villager-friend','the-void':'redstone-eng','netherite-upgrade':'diamond-ore','warden-slayer':'dragon-breath','elytra-flight':'speedrunner','campfire-rest':'invis-potion','clock-sync':'villager-friend','spyglass-focus':'mining-fatigue','glowstone-night':'phantom-hunter','slimeball-stuck':'crafting-table','observer-stats':'slimeball-stuck','golden-apple':'respawn-anchor','enchanted-apple':'golden-apple','shield-defense':'enchanted-apple','anvil-repair':'shield-defense','compass-nav':'redstone-eng','shulker-box':'compass-nav','note-block':'campfire-rest','command-block':'dye-crafter','jukebox-party':'redstone-eng','bookshelf-meb':'dragon-breath','ender-pearl':'speedrunner','chorus-fruit':'brewing-science','trident-loyalty':'unbreaking-3','nether-star':'trident-loyalty'};
+        const ACH_NAMES = {'crafting-table':['🪵','Odun Çağı','Sisteme ilk içeriğini girdin!'],'stone-age':['⛏️','Taş Devri','10 görev tamamladın!'],'iron-armor':['🛡️','Demir Zırh','Bir denemede 50 neti geçtin!'],'diamond-ore':['💎','ELMAS!!!','Bir denemede 80 net üstü!'],'enchanting':['📖','Büyü Masası','Toplam 1000 soru çözdün!'],'dragon-breath':['🐲','Ejderha Nefesi','Tüm MEB konularını tamamladın!'],'speedrunner':['⚡','Speedrunner','20 soruyu 10 dakikada bitirdin!'],'invis-potion':['🌫️','Görünmezlik İksiri','120 dakika kesintisiz odak!'],'firin-ustasi':['🍞','Fırıncı','Marketten ilk yiyecek aldın!'],'potion-master':['🧪','İksir Ustası','10 kez Kahve/İçecek aldın!'],'trade-center':['💰','Ticaret Merkezi','Toplam 2000 XP harcadın!'],'haritaci':['🗺️','Haritacı','Tüm sayfaları keşfettin!'],'redstone-eng':['⚙️','Kızıltaş Mühendisi','Haftalık planını eksiksiz doldurdun!'],'beacon-light':['🗼','Fener (Beacon)','10. Seviyeye ulaştın!'],'villager-friend':['🧑‍🌾','Köylü Dostu','5 gün üst üste giriş yaptın!'],'world-traveler':['🌍','Dünya Gezgini','Başarımlar sayfasını 50 kez açtın!'],'monster-hunter':['⚔️','Canavar Avcısı','İlk Boss görevini tamamladın!'],'wither-slayer':['💀','Wither Avcısı','10 Boss görevi tamamladın!'],'hardcore-mode':['💔','Hardcore Mod','Bir hafta sıfır sektirme!'],'lgs-slayer':['👑','LGS Slayer','TÜM başarımları açtın!'],'redstone-math':['📐','Kızıltaş Hesap Makinesi','Mat testlerinde 100 doğruya ulaştın!'],'enchant-translator':['📖','Büyü Masası Çevirmeni','Türkçede 3 testi hatasız bitirdin!'],'brewing-science':['🧪','İksir Tezgahı','Fen sorularından 50 tane çözdün!'],'ancient-history':['📜','Antik Kalıntı','Sosyal/İnkılap konularını tamamladın!'],'wandering-english':['🌍','Gezgin Tüccar','İngilizce testlerinde 500 XP topladın!'],'totem-religion':['🌙','Ölümsüzlük Totemi','Din testlerinde 5 ardışık %100!'],'speed-potion-2':['☄️','Hız İksiri II','Hızda 15 sn altında soru çözdün!'],'mending-book':['🛠️','Tamir Büyüsü','20 yanlışı doğruya çevirdin!'],'phantom-hunter':['🦇','Fantom Avcısı','Gece 22:00 sonrası 1 saat odak!'],'sunrise-clock':['🌅','Gündoğumu','07:00 öncesi giriş yapıp görev bitirdin!'],'mining-fatigue':['⛏️','Madenci Yorgunluğu','Tek oturumda 3 saat çalıştın!'],'respawn-anchor':['⚓','Yeniden Doğma Çapası','Denemede 20 net artışı yakaladın!'],'emerald-block':['🟩','Zümrüt Bloğu','Cüzdanda 5000 XP biriktirdin!'],'item-frame':['🖼️','Koleksiyoncu','5 farklı kategoride market alışı!'],'dye-crafter':['🎨','Boya Ustası','Tüm temaları kullandın!'],'unbreaking-3':['🛡️','Kırılmazlık III','30 gün kesintisiz ziyaret!'],'the-void':['🌌','Hiçlik (The Void)','Plansız ekstra konu çalıştın!'],'netherite-upgrade':['🪨','Netherit Yükseltmesi','3 denemede üst üste 80 net!'],'warden-slayer':['👹','Warden Avcısı','Tüm zor MEB konularını bitirdin!'],'elytra-flight':['🪽','Elytra','Hızda 50 soruyu sıfır hatayla geçtin!'],'campfire-rest':['🔥','Kamp Ateşi','4 pomodoro + 1 uzun mola döngüsü!'],'clock-sync':['⏰','Saat','3 gün üst üste zamanında başladın!'],'spyglass-focus':['🔭','Dürbün','Tek derste 150 soru çözdün!'],'glowstone-night':['💡','Işıktaşı','Gece yarısı 50 netli deneme bitirdin!'],'slimeball-stuck':['🟩','Balçık Topu','İlk soruyu sorulacaklara ekledin!'],'observer-stats':['👁️','Gözlemci','10 dk hata analizi yaptın!'],'golden-apple':['🍎','Altın Elma','3 yanlış sonrası 5 ardışık doğru!'],'enchanted-apple':['🌟','Büyülü Altın Elma','Tek günde 500 soru barajı!'],'shield-defense':['🛡️','Kalkan','Zayıf derste yanlışları yarıya indirdin!'],'anvil-repair':['🗜️','Örs','Zor seviye 5 test tamamladın!'],'compass-nav':['🧭','Pusula','Haftalık programı eksiksiz oluşturdun!'],'shulker-box':['🧰','Shulker Kutusu','50 soru kaydettin!'],'note-block':['🎵','Nota Bloğu','Odak müziğini 10 kez aktifleştirdin!'],'command-block':['⚙️','Komut Bloğu','Ayarlarda 3 değişiklik yaptın!'],'jukebox-party':['📻','Müzik Kutusu',"Haftalık hedeflerin %100'ünü tamamladın!"],'bookshelf-meb':['📚','Kitaplık','MEB sorularının yarısını bitirdin!'],'ender-pearl':['🔮','Ender İncisi','10 soruyu 5 dk\'da çözdün!'],'chorus-fruit':['🌺','Koro Meyvesi','Konfor alanından çıkıp 2 ekstra test!'],'trident-loyalty':['🔱','Sadakat Mızrağı','60 gün kesintisiz giriş!'],'nether-star':['⭐','Nether Yıldızı','Türkiye Geneli denemesini sisteme girdin!']};
+
+        function checkAndUnlock(id) {
+            if (appData.achievements[id]) return false;
+            const dep=ACH_DEPS[id]; if(dep&&!appData.achievements[dep]) return false;
+            appData.achievements[id]=true;
+            const xp=ACH_XP[id]||0;
+            if(xp>0){appData.xpTotal+=xp;appData.xpBalance+=xp;}
+            saveData(appData); updateHeader(); _showAchToast(id,xp);
+            if(id!=='lgs-slayer'){const all=Object.keys(ACH_DEPS).filter(k=>k!=='lgs-slayer');if(all.every(k=>appData.achievements[k]))setTimeout(()=>checkAndUnlock('lgs-slayer'),1200);}
+            return true;
+        }
+        function _showAchToast(id,xp) {
+            const info=ACH_NAMES[id]; if(!info) return;
+            let c=document.getElementById('_ach-toast-container');
+            if(!c){c=document.createElement('div');c.id='_ach-toast-container';c.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;gap:10px;align-items:center;pointer-events:none;';document.body.appendChild(c);}
+            const t=document.createElement('div');
+            t.style.cssText='background:#000;border:2px solid #ffaa00;border-radius:14px;padding:14px 22px;display:flex;align-items:center;gap:14px;box-shadow:0 0 28px rgba(255,170,0,0.5);opacity:0;transform:translateY(24px) scale(0.95);transition:opacity 0.35s ease,transform 0.35s cubic-bezier(0.34,1.56,0.64,1);max-width:420px;min-width:280px;';
+            t.innerHTML=`<div style="font-size:32px">${info[0]}</div><div><div style="font-size:9px;color:#ffaa00;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">🏆 BAŞARIM AÇILDI!</div><div style="font-size:14px;font-weight:bold;color:#fff;margin-bottom:2px;">${info[1]}</div><div style="font-size:11px;color:#666;">${info[2]}</div></div>${xp>0?`<div style="font-size:13px;font-weight:bold;color:#ffaa00;white-space:nowrap;margin-left:auto;">+${xp} XP</div>`:''}`;
+            c.appendChild(t);
+            requestAnimationFrame(()=>requestAnimationFrame(()=>{t.style.opacity='1';t.style.transform='translateY(0) scale(1)';}));
+            setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(-12px) scale(0.96)';setTimeout(()=>t.remove(),400);},3500);
+        }
+        const ALL_PAGES=['index','meb','deneme','hiz','achievements'];
+        function registerPage(p){if(!appData.visitedPages.includes(p)){appData.visitedPages.push(p);saveData(appData);}if(ALL_PAGES.every(x=>appData.visitedPages.includes(x)))checkAndUnlock('haritaci');}
+
+        /* ── TEMA ─────────────────────────────────────────── */
+        const themes=['','theme-cyan','theme-purple','theme-green'];
+        function applyTheme(){document.body.className=themes[appData.themeIdx]||'';}
+        function cycleTheme(){appData.themeIdx=(appData.themeIdx+1)%themes.length;saveData(appData);applyTheme();}
+
+        /* ── HEADER ───────────────────────────────────────── */
+        function updateHeader() {
+            const level=Math.floor(appData.xpTotal/100)+1;
+            document.getElementById('level').innerText=level;
+            document.getElementById('xp-balance').innerText=appData.xpBalance;
+            document.getElementById('header-xp-bar').style.width=(appData.xpTotal%100)+'%';
+            const ranks=['ÇAYLAK','DENEYİMLİ','USTA','FENLİSELİ','EFSANE'];
+            document.getElementById('rank-name').innerText=ranks[Math.min(level-1,4)];
+        }
+
+        /* ── DERS VERİSİ ──────────────────────────────────── */
+        const dersler = [
+            {id:'turkce', ad:'TÜRKÇE',         icon:'📖', bg:'📖', konular:['Sözcükte Anlam','Cümlede Anlam','Paragrafta Anlam','Yazım Kuralları','Noktalama İşaretleri','Fiilimsiler','Anlatım Bozuklukları','Söz Sanatları']},
+            {id:'mat',    ad:'MATEMATİK',       icon:'📐', bg:'🔢', konular:['Çarpanlar ve Katlar','Üslü İfadeler','Kareköklü İfadeler','Cebirsel İfadeler','Denklemler','Eşitsizlikler','Oran-Orantı','Olasılık']},
+            {id:'fen',    ad:'FEN BİLİMLERİ',   icon:'🔬', bg:'⚗️', konular:['DNA ve Genetik','Hücre Bölünmesi','Basınç','Kuvvet ve Hareket','Enerji Dönüşümleri','Elektrik','Kimyasal Tepkimeler','Asit-Baz']},
+            {id:'ing',    ad:'İNGİLİZCE',       icon:'🌍', bg:'🗣️', konular:['Present Tense','Past Tense','Future Tense','Modals','Conditionals','Vocabulary','Reading','Listening']},
+            {id:'sosyal', ad:'SOSYAL BİLİMLER', icon:'🗺️', bg:'🏛️', konular:['Coğrafya-Bölgeler','Nüfus ve Yerleşme','Osmanlı Tarihi','Atatürk İlkeleri','İnsan Hakları','Ekonomi','Yönetim','Kültür']},
+            {id:'din',    ad:'DİN KÜLTÜRÜ',     icon:'☪️',  bg:'📿', konular:['İbadetler','Namaz','Oruç','Peygamberler','Kuran','Ahlak','Hz. Muhammed','İslam Tarihi']},
+        ];
+        const tickTypes  = ['konu','tekrar','test','deneme'];
+        const tickLabels = {konu:'📝 Konu',tekrar:'🔄 Tekrar',test:'📋 Test',deneme:'📊 Deneme'};
+
+        /* TOPLAM KONU SAYISI: 6 ders × 8 konu = 48 */
+        const TOPLAM_KONU = dersler.reduce((s,d)=>s+d.konular.length, 0);
+
+        /* ── RENDER ───────────────────────────────────────── */
+        function renderMebPage() {
+            const grid = document.getElementById('meb-grid');
+            grid.innerHTML = '';
+            let toplamTamamlanan = 0;
+
+            dersler.forEach(ders => {
+                const block = document.createElement('div');
+                block.className = 'ders-block';
+                block.setAttribute('data-icon', ders.bg);
+
+                let tamamlanan = 0;
+                ders.konular.forEach((_,idx) => {
+                    const key = `${ders.id}-${idx}`;
+                    if (!appData.mebData[key]) appData.mebData[key]={konu:false,tekrar:false,test:false,deneme:false};
+                    const d = appData.mebData[key];
+                    if (d.konu&&d.tekrar&&d.test&&d.deneme) tamamlanan++;
+                });
+                toplamTamamlanan += tamamlanan;
+                const yuzde   = Math.round((tamamlanan/ders.konular.length)*100);
+                const dersXP  = tamamlanan*10;
+
+                let html = `
+                    <div class="ders-title-row">
+                        <span class="ders-icon">${ders.icon}</span>
+                        <span class="ders-title">${ders.ad}</span>
+                        <span class="ders-xp-badge">⚡ ${dersXP} XP</span>
+                    </div>
+                    <div class="progress-bar-container"><div class="progress-bar-fill" style="width:${yuzde}%"></div></div>
+                    <div class="progress-text">${tamamlanan}/${ders.konular.length} Konu &nbsp;·&nbsp; %${yuzde}</div>
+                    <div class="konular-wrapper">`;
+
+                ders.konular.forEach((konu,idx) => {
+                    const key = `${ders.id}-${idx}`;
+                    const d   = appData.mebData[key];
+                    const isCom = d.konu&&d.tekrar&&d.test&&d.deneme;
+                    html += `<div class="konu-item ${isCom?'completed':''}" id="konu-${ders.id}-${idx}">
+                        <div class="konu-name-row"><span class="konu-name">${idx+1}. ${konu}</span><span class="konu-xp-earned">+10 XP ✓</span></div>
+                        <div class="tick-row">`;
+                    tickTypes.forEach(type => {
+                        html += `<label class="tick-box ${d[type]?'checked':''}" onclick="handleTick('${ders.id}',${idx},'${type}',this)"><input type="checkbox" ${d[type]?'checked':''} onchange="toggleTick('${ders.id}',${idx},'${type}')">${tickLabels[type]}</label>`;
+                    });
+                    html += `</div></div>`;
+                });
+                html += `</div>`;
+                block.innerHTML = html;
+                grid.appendChild(block);
+            });
+
+            /* Genel bar */
+            const yuzde = TOPLAM_KONU>0 ? Math.round((toplamTamamlanan/TOPLAM_KONU)*100) : 0;
+            document.getElementById('overall-bar-fill').style.width = yuzde+'%';
+            document.getElementById('overall-stats-text').textContent = `${toplamTamamlanan} / ${TOPLAM_KONU} Konu (${yuzde}%)`;
+
+            /* dragon-breath: TÜM konular tamamlandı mı? */
+            if (toplamTamamlanan >= TOPLAM_KONU && TOPLAM_KONU > 0) {
+                checkAndUnlock('dragon-breath');
+            }
+
+            /* bookshelf-meb: yarısı (24/48) tamamlandı mı? */
+            if (toplamTamamlanan >= Math.floor(TOPLAM_KONU/2)) {
+                checkAndUnlock('bookshelf-meb');
+            }
+
+            /* ancient-history: sosyal dersindeki tüm konular tamamlandı mı?
+               (dersler dizisinde sosyal id='sosyal', konularında Osmanlı/Atatürk/İnkılap var) */
+            const sosyalDers = dersler.find(d=>d.id==='sosyal');
+            if (sosyalDers) {
+                const sosyalTam = sosyalDers.konular.every((_,idx)=>{
+                    const k=appData.mebData[`sosyal-${idx}`];
+                    return k&&k.konu&&k.tekrar&&k.test&&k.deneme;
+                });
+                if (sosyalTam) checkAndUnlock('ancient-history');
+            }
+
+            /* warden-slayer: tüm 6 dersin son 2 konusu (idx 6,7 = genellikle en zor konular) tamamlandı mı? */
+            const zorKonuTam = dersler.every(ders=>
+                [6,7].every(idx=>{
+                    const k=appData.mebData[`${ders.id}-${idx}`];
+                    return k&&k.konu&&k.tekrar&&k.test&&k.deneme;
+                })
+            );
+            if (zorKonuTam) checkAndUnlock('warden-slayer');
+
+            updateLGSMini();
+        }
+
+        /* ── TİCK TOGGLE ──────────────────────────────────── */
+        function toggleTick(dersId, konuIdx, type) {
+            const key = `${dersId}-${konuIdx}`;
+            appData.mebData[key][type] = !appData.mebData[key][type];
+            const d = appData.mebData[key];
+            const isNowComplete = d.konu&&d.tekrar&&d.test&&d.deneme;
+
+            if (isNowComplete && !appData.mebData[key]._xpGiven) {
+                appData.mebData[key]._xpGiven = true;
+                appData.xpTotal+=10; appData.xpBalance+=10;
+                showXPToast(10);
+
+                /* crafting-table: ilk konu tick */
+                checkAndUnlock('crafting-table');
+
+                /* beacon-light: Level 10 */
+                if (Math.floor(appData.xpTotal/100)+1 >= 10) checkAndUnlock('beacon-light');
+
+            } else if (!isNowComplete && appData.mebData[key]._xpGiven) {
+                appData.mebData[key]._xpGiven = false;
+                appData.xpTotal   = Math.max(0,appData.xpTotal-10);
+                appData.xpBalance = Math.max(0,appData.xpBalance-10);
+            }
+
+            /* crafting-table: herhangi bir tick yapılmışsa da aç */
+            if (d.konu||d.tekrar||d.test||d.deneme) checkAndUnlock('crafting-table');
+
+            saveData(appData);
+            updateHeader();
+            renderMebPage(); /* Re-render (ilerleme barı güncellenir) */
+        }
+
+        function handleTick(dersId, konuIdx, type, labelEl) {
+            const cb = labelEl.querySelector('input[type="checkbox"]');
+            if (cb) setTimeout(()=>{ cb.checked?labelEl.classList.add('checked'):labelEl.classList.remove('checked'); }, 0);
+        }
+
+        /* ── XP TOAST ─────────────────────────────────────── */
+        let toastTimeout;
+        function showXPToast(amount) {
+            const t = document.getElementById('xp-toast');
+            t.textContent = `⚡ +${amount} XP KAZANILDI!`;
+            t.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(()=>t.classList.remove('show'), 2500);
+        }
+
+        function updateLGSMini() {
+            const days=Math.floor((new Date('June 14, 2026 09:30:00').getTime()-Date.now())/(1000*60*60*24));
+            const el=document.getElementById('lgs-days-mini'); if(el) el.textContent=days;
+        }
+
+        /* ── BAŞLANGIÇ ────────────────────────────────────── */
+        applyTheme(); updateHeader(); renderMebPage();
+        registerPage('meb');
+    </script>
+</body>
+</html>

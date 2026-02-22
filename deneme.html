@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deneme Analizi · LGS.OS</title>
+    <style>
+        :root {
+            --primary: #ff8800; --primary-glow: rgba(255,136,0,0.6);
+            --bg: #050505; --card: #111; --text: #ddd; --accent: #00ff88;
+            --header-bg: #000; --danger: #ff3333;
+            --mc-green: #55ff55; --mc-green-glow: rgba(85,255,85,0.8);
+            --mc-purple: #aa00ff; --mc-gold: #ffaa00;
+        }
+        body.theme-cyan   { --primary:#00f2ff; --primary-glow:rgba(0,242,255,0.6); }
+        body.theme-purple { --primary:#bc13fe; --primary-glow:rgba(188,19,254,0.6); }
+        body.theme-green  { --primary:#39ff14; --primary-glow:rgba(57,255,20,0.6); }
+        * { box-sizing:border-box; }
+        body { font-family:'Segoe UI',sans-serif; background-color:var(--bg); color:var(--text); margin:0; display:flex; flex-direction:column; min-height:100vh; overflow-y:auto; transition:0.3s; }
+        .top-header { width:100%; height:60px; background-color:var(--header-bg); border-bottom:2px solid #222; display:flex; align-items:center; justify-content:space-between; padding:0 20px; position:sticky; top:0; z-index:1000; }
+        .logo { color:var(--primary); font-weight:bold; font-size:20px; letter-spacing:2px; text-shadow:0 0 10px var(--primary-glow); }
+        .header-stats { display:flex; align-items:center; gap:12px; width:380px; }
+        .lvl-box { font-weight:bold; color:var(--primary); font-size:14px; }
+        .header-xp-container { flex:1; height:10px; background:#222; border-radius:5px; overflow:hidden; border:1px solid #333; }
+        #header-xp-bar { height:100%; background:var(--primary); width:0%; transition:width 0.5s ease; box-shadow:0 0 8px var(--primary); }
+        .rank-tag { font-size:10px; background:var(--primary); color:#000; padding:2px 6px; border-radius:4px; font-weight:bold; white-space:nowrap; }
+        button, .nav-link { padding:6px 10px; font-size:10px; border:1px solid var(--primary); background:transparent; color:var(--primary); cursor:pointer; font-weight:bold; transition:0.3s; border-radius:12px !important; text-decoration:none; display:inline-block; line-height:normal; white-space:nowrap; }
+        button:hover, .nav-link:hover { background:var(--primary); color:#000; box-shadow:0 0 8px var(--primary-glow); }
+        .nav-link.active-page { background:var(--primary); color:#000; box-shadow:0 0 10px var(--primary-glow); }
+        .nav-link.achievements-link { border-color:var(--mc-green); color:var(--mc-green); box-shadow:0 0 10px var(--mc-green-glow); }
+        .nav-link.achievements-link:hover { background:var(--mc-green); color:#000; }
+        input[type="text"],input[type="number"],select { background:#000; border:1px solid #333; color:#fff; padding:6px; font-size:11px; border-radius:12px !important; }
+        .analiz-container { background:var(--card); border:2px solid #222; border-radius:12px; padding:20px; margin-bottom:15px; transition:all 0.3s ease; }
+        .analiz-container:hover { border-color:var(--primary); box-shadow:0 0 10px var(--primary-glow); }
+        .page-title { font-size:26px; font-weight:bold; color:var(--primary); text-shadow:0 0 15px var(--primary-glow),0 0 30px var(--primary-glow); letter-spacing:3px; margin:0 0 6px 0; text-align:center; }
+        .page-subtitle { color:#555; font-size:11px; margin:0 0 25px 0; text-align:center; letter-spacing:1px; }
+        .deneme-name-input { width:100%; padding:10px; font-size:13px; margin-bottom:15px; border:1px solid #333; background:#000; color:#fff; border-radius:12px !important; transition:0.3s; }
+        .deneme-name-input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 8px var(--primary-glow); }
+        .deneme-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:15px; margin-bottom:20px; }
+        .ders-input-group { background:#000; border:1px solid #222; border-radius:10px; padding:12px; transition:0.3s; }
+        .ders-input-group:hover { border-color:var(--primary); box-shadow:0 0 8px var(--primary-glow); }
+        .ders-input-group h6 { margin:0 0 10px 0; color:var(--primary); font-size:11px; text-align:center; text-transform:uppercase; letter-spacing:1px; }
+        .dy-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
+        .dy-col { display:flex; flex-direction:column; gap:3px; }
+        .dy-col label { font-size:9px; color:#666; text-transform:uppercase; letter-spacing:0.5px; }
+        .dy-col input { width:100%; padding:6px; font-size:12px; text-align:center; }
+        .net-display { text-align:center; padding:8px; background:#0a0a0a; border-radius:8px; border:1px solid #1a1a1a; color:var(--primary); font-weight:bold; font-size:15px; transition:all 0.3s; letter-spacing:1px; }
+        .net-display.positive { color:var(--accent); border-color:var(--accent); box-shadow:0 0 8px rgba(0,255,136,0.3); }
+        .toplam-net-wrapper { text-align:center; margin:18px 0; padding:16px; background:#000; border-radius:12px; border:2px solid #1a1a1a; transition:0.3s; }
+        .toplam-net-wrapper.yuksek { border-color:var(--accent); box-shadow:0 0 15px rgba(0,255,136,0.2); }
+        .toplam-net-label { font-size:11px; color:#555; margin-bottom:6px; text-transform:uppercase; letter-spacing:2px; }
+        #toplam-net { font-size:30px; color:var(--accent); font-weight:bold; text-shadow:0 0 15px rgba(0,255,136,0.5); transition:all 0.3s; }
+        .deneme-card { background:#0a0a0a; border:1px solid #1e1e1e; border-radius:12px; padding:15px; margin-bottom:10px; transition:all 0.3s; animation:fadeInUp 0.3s ease both; }
+        .deneme-card:hover { border-color:var(--primary); box-shadow:0 0 10px var(--primary-glow); }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+        .deneme-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #1a1a1a; }
+        .deneme-header .deneme-adi { color:var(--primary); font-weight:bold; font-size:13px; }
+        .deneme-header .deneme-tarih { color:#444; font-size:10px; }
+        .deneme-header .deneme-net-badge { color:var(--accent); font-weight:bold; font-size:14px; background:rgba(0,255,136,0.08); border:1px solid rgba(0,255,136,0.2); padding:3px 10px; border-radius:20px; }
+        .deneme-stats { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; text-align:center; font-size:11px; }
+        .deneme-stats>div { background:#000; border:1px solid #1a1a1a; border-radius:8px; padding:8px 4px; transition:0.2s; }
+        .deneme-stats>div:hover { border-color:var(--primary); }
+        .stat-ders-adi { color:#555; font-size:9px; margin-bottom:4px; text-transform:uppercase; }
+        .stat-net { color:var(--primary); font-weight:bold; font-size:13px; }
+        .stat-dy { font-size:9px; color:#333; margin-top:3px; }
+        .btn-row { display:flex; gap:10px; justify-content:center; margin-top:5px; }
+        .btn-kaydet { border-color:var(--accent); color:var(--accent); }
+        .btn-kaydet:hover { background:var(--accent); color:#000; box-shadow:0 0 10px rgba(0,255,136,0.5); }
+        .gecmis-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+        .gecmis-title { font-size:14px; font-weight:bold; color:var(--primary); text-shadow:0 0 8px var(--primary-glow); }
+        .deneme-sayac { font-size:10px; color:#555; background:#000; border:1px solid #222; padding:3px 10px; border-radius:20px; }
+        .status-mini-bar { background:#000; border-top:2px solid #1a1a1a; padding:8px 20px; display:flex; justify-content:space-between; align-items:center; font-size:10px; color:#444; margin-top:auto; }
+        .status-mini-bar span { color:var(--primary); font-weight:bold; }
+        .xp-toast { position:fixed; bottom:30px; right:30px; background:#000; border:2px solid var(--accent); color:var(--accent); padding:12px 20px; border-radius:12px; font-weight:bold; font-size:14px; box-shadow:0 0 20px rgba(0,255,136,0.4); z-index:9999; opacity:0; transform:translateY(20px); transition:opacity 0.3s,transform 0.3s; pointer-events:none; }
+        .xp-toast.show { opacity:1; transform:translateY(0); }
+        @media(max-width:800px) { .deneme-grid{grid-template-columns:repeat(2,1fr)} .deneme-stats{grid-template-columns:repeat(3,1fr)} }
+    </style>
+</head>
+<body id="mainBody">
+    <header class="top-header">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div class="logo">⚡ LGS.OS</div>
+            <a class="nav-link" href="index.html">🏠 ANA SAYFA</a>
+            <button onclick="cycleTheme()">TEMA</button>
+            <a class="nav-link" href="meb.html">📚 MEB KONU</a>
+            <a class="nav-link active-page" href="deneme.html">📊 DENEME</a>
+            <a class="nav-link" href="hiz.html">⚡ HIZ MODU</a>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <a class="nav-link achievements-link" href="achievements.html">🏆 BAŞARIMLAR</a>
+            <div class="header-stats">
+                <span class="rank-tag" id="rank-name">ÇAYLAK</span>
+                <div class="lvl-box">LVL <span id="level">1</span></div>
+                <div class="header-xp-container"><div id="header-xp-bar"></div></div>
+                <div style="font-size:11px;color:var(--primary);font-weight:bold;"><span id="xp-balance">0</span> XP</div>
+            </div>
+        </div>
+    </header>
+
+    <div style="padding:25px 20px;flex:1;">
+        <h2 class="page-title">📊 DENEME ANALİZİ</h2>
+        <p class="page-subtitle">Doğru/Yanlış gir → Net otomatik hesaplansın &nbsp;·&nbsp; Kaydet &amp; <span style="color:var(--primary);">+25 XP</span> kazan</p>
+
+        <div class="analiz-container">
+            <h5 style="margin:0 0 15px 0;color:var(--primary);letter-spacing:1px;">➕ YENİ DENEME EKLE</h5>
+            <input type="text" id="deneme-adi" class="deneme-name-input" placeholder="Deneme Adı (Örn: Aralık 1. Deneme)" maxlength="60">
+            <div class="deneme-grid">
+                <div class="ders-input-group"><h6>📖 Türkçe (20 Soru)</h6><div class="dy-row"><div class="dy-col"><label>Doğru</label><input type="number" id="turkce-d" min="0" max="20" value="0" oninput="calcNet()"></div><div class="dy-col"><label>Yanlış</label><input type="number" id="turkce-y" min="0" max="20" value="0" oninput="calcNet()"></div></div><div class="net-display" id="turkce-net">0.00</div></div>
+                <div class="ders-input-group"><h6>📐 Matematik (20 Soru)</h6><div class="dy-row"><div class="dy-col"><label>Doğru</label><input type="number" id="mat-d" min="0" max="20" value="0" oninput="calcNet()"></div><div class="dy-col"><label>Yanlış</label><input type="number" id="mat-y" min="0" max="20" value="0" oninput="calcNet()"></div></div><div class="net-display" id="mat-net">0.00</div></div>
+                <div class="ders-input-group"><h6>🔬 Fen Bilimleri (20 Soru)</h6><div class="dy-row"><div class="dy-col"><label>Doğru</label><input type="number" id="fen-d" min="0" max="20" value="0" oninput="calcNet()"></div><div class="dy-col"><label>Yanlış</label><input type="number" id="fen-y" min="0" max="20" value="0" oninput="calcNet()"></div></div><div class="net-display" id="fen-net">0.00</div></div>
+                <div class="ders-input-group"><h6>🌍 İngilizce (10 Soru)</h6><div class="dy-row"><div class="dy-col"><label>Doğru</label><input type="number" id="ing-d" min="0" max="10" value="0" oninput="calcNet()"></div><div class="dy-col"><label>Yanlış</label><input type="number" id="ing-y" min="0" max="10" value="0" oninput="calcNet()"></div></div><div class="net-display" id="ing-net">0.00</div></div>
+                <div class="ders-input-group"><h6>🗺️ Sosyal Bilimler (10 Soru)</h6><div class="dy-row"><div class="dy-col"><label>Doğru</label><input type="number" id="sos-d" min="0" max="10" value="0" oninput="calcNet()"></div><div class="dy-col"><label>Yanlış</label><input type="number" id="sos-y" min="0" max="10" value="0" oninput="calcNet()"></div></div><div class="net-display" id="sos-net">0.00</div></div>
+                <div class="ders-input-group"><h6>☪️ Din Kültürü (10 Soru)</h6><div class="dy-row"><div class="dy-col"><label>Doğru</label><input type="number" id="din-d" min="0" max="10" value="0" oninput="calcNet()"></div><div class="dy-col"><label>Yanlış</label><input type="number" id="din-y" min="0" max="10" value="0" oninput="calcNet()"></div></div><div class="net-display" id="din-net">0.00</div></div>
+            </div>
+            <div class="toplam-net-wrapper" id="toplam-net-wrapper">
+                <div class="toplam-net-label">TOPLAM NET</div>
+                <div id="toplam-net">0.00</div>
+            </div>
+            <div class="btn-row">
+                <button class="btn-kaydet" onclick="saveDeneme()">💾 KAYDET (+25 XP)</button>
+                <button onclick="clearDenemeForm()">🗑️ TEMİZLE</button>
+            </div>
+        </div>
+
+        <div class="analiz-container">
+            <div class="gecmis-header">
+                <span class="gecmis-title">📜 KAYITLI DENEMELER</span>
+                <span class="deneme-sayac" id="deneme-sayac">0 deneme</span>
+            </div>
+            <div id="deneme-list"></div>
+        </div>
+    </div>
+
+    <div class="status-mini-bar">
+        <div>LGS.OS &nbsp;·&nbsp; DENEME ANALİZ MODÜLÜ</div>
+        <div>LGS: <span id="lgs-days-mini">---</span> GÜN KALDI</div>
+    </div>
+    <div class="xp-toast" id="xp-toast">✅ +25 XP KAZANILDI!</div>
+
+    <script>
+        /* ── VERİ ─────────────────────────────────────────── */
+        const STORAGE_KEY = 'LGS_GAMER_OS_DATA';
+        function loadData() {
+            try { const r=localStorage.getItem(STORAGE_KEY); if(r) return JSON.parse(r); } catch(e) {}
+            return { xpTotal:0,xpBalance:0,themeIdx:0,tasks:[],todos:[],planData:{},mebData:{},denemeler:[],hizHistory:[],hizSorular:Array(40).fill('bos'),achievements:{},visitedPages:[],achievementOpenCount:0,marketStats:{drinkCount:0,totalSpent:0},loginStreak:{lastDate:'',streak:0},bossCompleted:0,focusMinutes:0,completedTaskCount:0 };
+        }
+        function saveData(d) { localStorage.setItem(STORAGE_KEY,JSON.stringify(d)); }
+        let appData = loadData();
+        if (!appData.achievements) appData.achievements = {};
+        if (!appData.denemeler)    appData.denemeler = [];
+        if (!appData.visitedPages) appData.visitedPages = [];
+
+        /* ── ACHIEVEMENT ENGINE ───────────────────────────── */
+        const ACH_XP = {'crafting-table':10,'stone-age':20,'iron-armor':30,'diamond-ore':50,'enchanting':75,'dragon-breath':100,'speedrunner':40,'invis-potion':60,'firin-ustasi':15,'potion-master':35,'trade-center':50,'haritaci':25,'redstone-eng':30,'beacon-light':80,'villager-friend':25,'world-traveler':20,'monster-hunter':20,'wither-slayer':60,'hardcore-mode':90,'lgs-slayer':200,'redstone-math':40,'enchant-translator':45,'brewing-science':25,'ancient-history':80,'wandering-english':20,'totem-religion':40,'speed-potion-2':15,'mending-book':35,'phantom-hunter':50,'sunrise-clock':20,'mining-fatigue':70,'respawn-anchor':45,'emerald-block':90,'item-frame':20,'dye-crafter':25,'unbreaking-3':100,'the-void':30,'netherite-upgrade':60,'warden-slayer':85,'elytra-flight':50,'campfire-rest':25,'clock-sync':40,'spyglass-focus':45,'glowstone-night':55,'slimeball-stuck':10,'observer-stats':20,'golden-apple':40,'enchanted-apple':100,'shield-defense':35,'anvil-repair':40,'compass-nav':25,'shulker-box':20,'note-block':15,'command-block':15,'jukebox-party':30,'bookshelf-meb':90,'ender-pearl':70,'chorus-fruit':35,'trident-loyalty':120,'nether-star':150};
+        const ACH_DEPS = {'crafting-table':null,'stone-age':'crafting-table','iron-armor':'stone-age','diamond-ore':'iron-armor','enchanting':'diamond-ore','dragon-breath':'enchanting','speedrunner':'iron-armor','invis-potion':'speedrunner','firin-ustasi':'crafting-table','potion-master':'firin-ustasi','trade-center':'potion-master','haritaci':'crafting-table','redstone-eng':'haritaci','beacon-light':'redstone-eng','villager-friend':'beacon-light','world-traveler':'villager-friend','monster-hunter':'crafting-table','wither-slayer':'monster-hunter','hardcore-mode':'wither-slayer','lgs-slayer':'dragon-breath','redstone-math':'stone-age','enchant-translator':'stone-age','brewing-science':'potion-master','ancient-history':'dragon-breath','wandering-english':'haritaci','totem-religion':'dragon-breath','speed-potion-2':'speedrunner','mending-book':'speedrunner','phantom-hunter':'invis-potion','sunrise-clock':'villager-friend','mining-fatigue':'invis-potion','respawn-anchor':'diamond-ore','emerald-block':'trade-center','item-frame':'firin-ustasi','dye-crafter':'haritaci','unbreaking-3':'villager-friend','the-void':'redstone-eng','netherite-upgrade':'diamond-ore','warden-slayer':'dragon-breath','elytra-flight':'speedrunner','campfire-rest':'invis-potion','clock-sync':'villager-friend','spyglass-focus':'mining-fatigue','glowstone-night':'phantom-hunter','slimeball-stuck':'crafting-table','observer-stats':'slimeball-stuck','golden-apple':'respawn-anchor','enchanted-apple':'golden-apple','shield-defense':'enchanted-apple','anvil-repair':'shield-defense','compass-nav':'redstone-eng','shulker-box':'compass-nav','note-block':'campfire-rest','command-block':'dye-crafter','jukebox-party':'redstone-eng','bookshelf-meb':'dragon-breath','ender-pearl':'speedrunner','chorus-fruit':'brewing-science','trident-loyalty':'unbreaking-3','nether-star':'trident-loyalty'};
+        const ACH_NAMES = {'crafting-table':['🪵','Odun Çağı','Sisteme ilk içeriğini girdin!'],'stone-age':['⛏️','Taş Devri','10 görev tamamladın!'],'iron-armor':['🛡️','Demir Zırh','Bir denemede 50 neti geçtin!'],'diamond-ore':['💎','ELMAS!!!','Bir denemede 80 net üstü!'],'enchanting':['📖','Büyü Masası','Toplam 1000 soru çözdün!'],'dragon-breath':['🐲','Ejderha Nefesi','Tüm MEB konularını tamamladın!'],'speedrunner':['⚡','Speedrunner','20 soruyu 10 dakikada bitirdin!'],'invis-potion':['🌫️','Görünmezlik İksiri','120 dakika kesintisiz odak!'],'firin-ustasi':['🍞','Fırıncı','Marketten ilk yiyecek aldın!'],'potion-master':['🧪','İksir Ustası','10 kez Kahve/İçecek aldın!'],'trade-center':['💰','Ticaret Merkezi','Toplam 2000 XP harcadın!'],'haritaci':['🗺️','Haritacı','Tüm sayfaları keşfettin!'],'redstone-eng':['⚙️','Kızıltaş Mühendisi','Haftalık planını eksiksiz doldurdun!'],'beacon-light':['🗼','Fener (Beacon)','10. Seviyeye ulaştın!'],'villager-friend':['🧑‍🌾','Köylü Dostu','5 gün üst üste giriş yaptın!'],'world-traveler':['🌍','Dünya Gezgini','Başarımlar sayfasını 50 kez açtın!'],'monster-hunter':['⚔️','Canavar Avcısı','İlk Boss görevini tamamladın!'],'wither-slayer':['💀','Wither Avcısı','10 Boss görevi tamamladın!'],'hardcore-mode':['💔','Hardcore Mod','Bir hafta sıfır sektirme!'],'lgs-slayer':['👑','LGS Slayer','TÜM başarımları açtın!'],'redstone-math':['📐','Kızıltaş Hesap Makinesi','Mat testlerinde 100 doğruya ulaştın!'],'enchant-translator':['📖','Büyü Masası Çevirmeni','Türkçede 3 testi hatasız bitirdin!'],'brewing-science':['🧪','İksir Tezgahı','Fen sorularından 50 tane çözdün!'],'ancient-history':['📜','Antik Kalıntı','Sosyal/İnkılap konularını tamamladın!'],'wandering-english':['🌍','Gezgin Tüccar','İngilizce testlerinde 500 XP topladın!'],'totem-religion':['🌙','Ölümsüzlük Totemi','Din testlerinde 5 ardışık %100!'],'speed-potion-2':['☄️','Hız İksiri II','Hızda 15 sn altında soru çözdün!'],'mending-book':['🛠️','Tamir Büyüsü','20 yanlışı doğruya çevirdin!'],'phantom-hunter':['🦇','Fantom Avcısı','Gece 22:00 sonrası 1 saat odak!'],'sunrise-clock':['🌅','Gündoğumu','07:00 öncesi giriş yapıp görev bitirdin!'],'mining-fatigue':['⛏️','Madenci Yorgunluğu','Tek oturumda 3 saat çalıştın!'],'respawn-anchor':['⚓','Yeniden Doğma Çapası','Denemede 20 net artışı yakaladın!'],'emerald-block':['🟩','Zümrüt Bloğu','Cüzdanda 5000 XP biriktirdin!'],'item-frame':['🖼️','Koleksiyoncu','5 farklı kategoride market alışı!'],'dye-crafter':['🎨','Boya Ustası','Tüm temaları kullandın!'],'unbreaking-3':['🛡️','Kırılmazlık III','30 gün kesintisiz ziyaret!'],'the-void':['🌌','Hiçlik (The Void)','Plansız ekstra konu çalıştın!'],'netherite-upgrade':['🪨','Netherit Yükseltmesi','3 denemede üst üste 80 net!'],'warden-slayer':['👹','Warden Avcısı','Tüm zor MEB konularını bitirdin!'],'elytra-flight':['🪽','Elytra','Hızda 50 soruyu sıfır hatayla geçtin!'],'campfire-rest':['🔥','Kamp Ateşi','4 pomodoro + 1 uzun mola döngüsü!'],'clock-sync':['⏰','Saat','3 gün üst üste zamanında başladın!'],'spyglass-focus':['🔭','Dürbün','Tek derste 150 soru çözdün!'],'glowstone-night':['💡','Işıktaşı','Gece yarısı 50 netli deneme bitirdin!'],'slimeball-stuck':['🟩','Balçık Topu','İlk soruyu sorulacaklara ekledin!'],'observer-stats':['👁️','Gözlemci','10 dk hata analizi yaptın!'],'golden-apple':['🍎','Altın Elma','3 yanlış sonrası 5 ardışık doğru!'],'enchanted-apple':['🌟','Büyülü Altın Elma','Tek günde 500 soru barajı!'],'shield-defense':['🛡️','Kalkan','Zayıf derste yanlışları yarıya indirdin!'],'anvil-repair':['🗜️','Örs','Zor seviye 5 test tamamladın!'],'compass-nav':['🧭','Pusula','Haftalık programı eksiksiz oluşturdun!'],'shulker-box':['🧰','Shulker Kutusu','50 soru kaydettin!'],'note-block':['🎵','Nota Bloğu','Odak müziğini 10 kez aktifleştirdin!'],'command-block':['⚙️','Komut Bloğu','Ayarlarda 3 değişiklik yaptın!'],'jukebox-party':['📻','Müzik Kutusu',"Haftalık hedeflerin %100'ünü tamamladın!"],'bookshelf-meb':['📚','Kitaplık','MEB sorularının yarısını bitirdin!'],'ender-pearl':['🔮','Ender İncisi','10 soruyu 5 dk\'da çözdün!'],'chorus-fruit':['🌺','Koro Meyvesi','Konfor alanından çıkıp 2 ekstra test!'],'trident-loyalty':['🔱','Sadakat Mızrağı','60 gün kesintisiz giriş!'],'nether-star':['⭐','Nether Yıldızı','Türkiye Geneli denemesini sisteme girdin!']};
+
+        function checkAndUnlock(id) {
+            if (appData.achievements[id]) return false;
+            const dep = ACH_DEPS[id]; if (dep && !appData.achievements[dep]) return false;
+            appData.achievements[id] = true;
+            const xp = ACH_XP[id]||0;
+            if (xp>0) { appData.xpTotal+=xp; appData.xpBalance+=xp; }
+            saveData(appData); updateHeader(); _showAchToast(id,xp);
+            if (id!=='lgs-slayer') { const all=Object.keys(ACH_DEPS).filter(k=>k!=='lgs-slayer'); if(all.every(k=>appData.achievements[k])) setTimeout(()=>checkAndUnlock('lgs-slayer'),1200); }
+            return true;
+        }
+        function _showAchToast(id,xp) {
+            const info=ACH_NAMES[id]; if(!info) return;
+            let c=document.getElementById('_ach-toast-container');
+            if(!c){c=document.createElement('div');c.id='_ach-toast-container';c.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;gap:10px;align-items:center;pointer-events:none;';document.body.appendChild(c);}
+            const t=document.createElement('div');
+            t.style.cssText='background:#000;border:2px solid #ffaa00;border-radius:14px;padding:14px 22px;display:flex;align-items:center;gap:14px;box-shadow:0 0 28px rgba(255,170,0,0.5);opacity:0;transform:translateY(24px) scale(0.95);transition:opacity 0.35s ease,transform 0.35s cubic-bezier(0.34,1.56,0.64,1);max-width:420px;min-width:280px;';
+            t.innerHTML=`<div style="font-size:32px">${info[0]}</div><div><div style="font-size:9px;color:#ffaa00;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">🏆 BAŞARIM AÇILDI!</div><div style="font-size:14px;font-weight:bold;color:#fff;margin-bottom:2px;">${info[1]}</div><div style="font-size:11px;color:#666;">${info[2]}</div></div>${xp>0?`<div style="font-size:13px;font-weight:bold;color:#ffaa00;white-space:nowrap;margin-left:auto;">+${xp} XP</div>`:''}`;
+            c.appendChild(t);
+            requestAnimationFrame(()=>requestAnimationFrame(()=>{t.style.opacity='1';t.style.transform='translateY(0) scale(1)';}));
+            setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(-12px) scale(0.96)';setTimeout(()=>t.remove(),400);},3500);
+        }
+
+        /* ── SAYFA ZİYARET ────────────────────────────────── */
+        const ALL_PAGES = ['index','meb','deneme','hiz','achievements'];
+        function registerPage(p) { if(!appData.visitedPages.includes(p)){appData.visitedPages.push(p);saveData(appData);} if(ALL_PAGES.every(x=>appData.visitedPages.includes(x))) checkAndUnlock('haritaci'); }
+
+        /* ── TEMA ─────────────────────────────────────────── */
+        const themes=['','theme-cyan','theme-purple','theme-green'];
+        function applyTheme(){document.body.className=themes[appData.themeIdx]||'';}
+        function cycleTheme(){appData.themeIdx=(appData.themeIdx+1)%themes.length;saveData(appData);applyTheme();}
+
+        /* ── HEADER ───────────────────────────────────────── */
+        function updateHeader() {
+            const level=Math.floor(appData.xpTotal/100)+1;
+            document.getElementById('level').innerText=level;
+            document.getElementById('xp-balance').innerText=appData.xpBalance;
+            document.getElementById('header-xp-bar').style.width=(appData.xpTotal%100)+'%';
+            const ranks=['ÇAYLAK','DENEYİMLİ','USTA','FENLİSELİ','EFSANE'];
+            document.getElementById('rank-name').innerText=ranks[Math.min(level-1,4)];
+        }
+
+        /* ── NET HESAPLA ──────────────────────────────────── */
+        const dersIds = ['turkce','mat','fen','ing','sos','din'];
+        function calcNet() {
+            let toplam=0;
+            dersIds.forEach(id=>{
+                const d=Math.max(0,parseInt(document.getElementById(`${id}-d`).value)||0);
+                const y=Math.max(0,parseInt(document.getElementById(`${id}-y`).value)||0);
+                const net=Math.max(0,d-(y/3));
+                const el=document.getElementById(`${id}-net`);
+                el.textContent=net.toFixed(2);
+                net>0?el.classList.add('positive'):el.classList.remove('positive');
+                toplam+=net;
+            });
+            const toplamEl=document.getElementById('toplam-net');
+            const wrapper=document.getElementById('toplam-net-wrapper');
+            toplamEl.textContent=toplam.toFixed(2);
+            toplam>=60?wrapper.classList.add('yuksek'):wrapper.classList.remove('yuksek');
+        }
+
+        /* ── DENEME KAYDET ────────────────────────────────── */
+        function saveDeneme() {
+            const adi=document.getElementById('deneme-adi').value.trim()||'İsimsiz Deneme';
+            const oku=id=>({
+                dogru: Math.max(0,parseInt(document.getElementById(`${id}-d`).value)||0),
+                yanlis:Math.max(0,parseInt(document.getElementById(`${id}-y`).value)||0),
+                net:   parseFloat(document.getElementById(`${id}-net`).textContent)||0
+            });
+            const deneme={adi,tarih:new Date().toLocaleDateString('tr-TR')};
+            dersIds.forEach(id=>deneme[id]=oku(id));
+            deneme.toplamNet=parseFloat(document.getElementById('toplam-net').textContent)||0;
+            deneme.toplamSoru=dersIds.reduce((s,id)=>s+(deneme[id].dogru+deneme[id].yanlis),0);
+
+            appData.denemeler.unshift(deneme);
+            appData.xpTotal+=25; appData.xpBalance+=25;
+
+            /* crafting-table */
+            checkAndUnlock('crafting-table');
+
+            /* iron-armor: herhangi bir denemede 50 net */
+            if (appData.denemeler.some(d=>d.toplamNet>=50)) checkAndUnlock('iron-armor');
+
+            /* diamond-ore: herhangi bir denemede 80 net */
+            if (appData.denemeler.some(d=>d.toplamNet>=80)) checkAndUnlock('diamond-ore');
+
+            /* enchanting: tüm deneme soruları toplamı 1000+ */
+            const toplamSoru = appData.denemeler.reduce((s,d)=>s+(d.toplamSoru||0),0);
+            if (toplamSoru>=1000) checkAndUnlock('enchanting');
+
+            /* beacon-light: Level 10 */
+            if (Math.floor(appData.xpTotal/100)+1 >= 10) checkAndUnlock('beacon-light');
+
+            /* respawn-anchor: önceki denemeden 20 net artışı */
+            if (appData.denemeler.length >= 2) {
+                const prev = appData.denemeler[1].toplamNet;
+                const curr = appData.denemeler[0].toplamNet;
+                if (prev < 60 && curr - prev >= 20) checkAndUnlock('respawn-anchor');
+            }
+
+            /* netherite-upgrade: son 3 denemede üst üste 80 net */
+            if (appData.denemeler.length >= 3) {
+                const last3 = appData.denemeler.slice(0,3);
+                if (last3.every(d=>d.toplamNet>=80)) checkAndUnlock('netherite-upgrade');
+            }
+
+            /* redstone-math: mat toplam doğrusu 100+ */
+            const matDogru = appData.denemeler.reduce((s,d)=>s+(d.mat?d.mat.dogru:0),0);
+            if (matDogru>=100) checkAndUnlock('redstone-math');
+
+            /* enchant-translator: türkçe'de 3 test 0 yanlış */
+            if (!appData.denemeler._trPerfect) appData.denemeler._trPerfect=0; /* geçici sayaç */
+            /* _trPerfect'i ayrı alanda tut */
+            if (!appData.trPerfectCount) appData.trPerfectCount=0;
+            if (deneme.turkce && deneme.turkce.yanlis===0 && deneme.turkce.dogru>0) {
+                appData.trPerfectCount = (appData.trPerfectCount||0)+1;
+                if (appData.trPerfectCount>=3) checkAndUnlock('enchant-translator');
+            }
+
+            /* brewing-science: fen soruları toplamı 50+ */
+            const fenSoru = appData.denemeler.reduce((s,d)=>s+(d.fen?(d.fen.dogru+d.fen.yanlis):0),0);
+            if (fenSoru>=50) checkAndUnlock('brewing-science');
+
+            /* wandering-english: ingilizce denemelerinde toplam XP 500+ (her ing sorusu ~5 XP say) */
+            if (!appData.ingXP) appData.ingXP=0;
+            appData.ingXP += (deneme.ing ? (deneme.ing.dogru+deneme.ing.yanlis)*5 : 0);
+            if (appData.ingXP>=500) checkAndUnlock('wandering-english');
+
+            /* totem-religion: din'de ardışık 5 test 0 yanlış */
+            if (!appData.dinPerfectStreak) appData.dinPerfectStreak=0;
+            if (deneme.din && deneme.din.yanlis===0 && deneme.din.dogru>0) {
+                appData.dinPerfectStreak=(appData.dinPerfectStreak||0)+1;
+                if (appData.dinPerfectStreak>=5) checkAndUnlock('totem-religion');
+            } else {
+                appData.dinPerfectStreak=0;
+            }
+
+            /* glowstone-night: gece yarısı (00:00-02:00) 50 netli deneme */
+            const nowHour = new Date().getHours();
+            if ((nowHour >= 0 && nowHour < 2) && deneme.toplamNet >= 50) checkAndUnlock('glowstone-night');
+
+            /* golden-apple: önceki denemede 3+ yanlış ardısık olan ders düzeldi mi? (yaklaşım: genel net artışı) */
+            if (appData.denemeler.length >= 2) {
+                const prev2 = appData.denemeler[1];
+                if (prev2 && deneme.toplamNet > prev2.toplamNet + 5) {
+                    if (!appData.goldenAppleProgress) appData.goldenAppleProgress = 0;
+                    appData.goldenAppleProgress++;
+                    if (appData.goldenAppleProgress >= 1) checkAndUnlock('golden-apple');
+                }
+            }
+
+            /* enchanted-apple: tek gün 500 soru (günlük soru sayacı) */
+            const todayStr = new Date().toDateString();
+            if (!appData.dailySoruCount || appData.dailySoruCountDate !== todayStr) {
+                appData.dailySoruCount = 0;
+                appData.dailySoruCountDate = todayStr;
+            }
+            appData.dailySoruCount += deneme.toplamSoru;
+            if (appData.dailySoruCount >= 500) checkAndUnlock('enchanted-apple');
+
+            /* shield-defense: en çok yanlış olan ders, sonraki denemede yarıya indi */
+            if (appData.denemeler.length >= 2) {
+                const prevD = appData.denemeler[1];
+                const maxYanlisId = dersIds.reduce((a,b)=>(prevD[a]?.yanlis||0)>(prevD[b]?.yanlis||0)?a:b, dersIds[0]);
+                const prevYanlis = prevD[maxYanlisId]?.yanlis||0;
+                const currYanlis = deneme[maxYanlisId]?.yanlis||0;
+                if (prevYanlis >= 4 && currYanlis <= prevYanlis/2) checkAndUnlock('shield-defense');
+            }
+
+            /* bookshelf-meb: MEB'de tamamlanan konu sayısı >= 24 (yarısı) */
+            const mebTam = Object.values(appData.mebData||{}).filter(d=>d.konu&&d.tekrar&&d.test&&d.deneme).length;
+            if (mebTam >= 24) checkAndUnlock('bookshelf-meb');
+
+            saveData(appData); updateHeader(); clearDenemeForm(); renderDenemeler(); showToast();
+        }
+
+        function clearDenemeForm() {
+            document.getElementById('deneme-adi').value='';
+            dersIds.forEach(id=>{ document.getElementById(`${id}-d`).value=0; document.getElementById(`${id}-y`).value=0; document.getElementById(`${id}-net`).textContent='0.00'; document.getElementById(`${id}-net`).classList.remove('positive'); });
+            document.getElementById('toplam-net').textContent='0.00';
+            document.getElementById('toplam-net-wrapper').classList.remove('yuksek');
+        }
+
+        function renderDenemeler() {
+            const list=document.getElementById('deneme-list');
+            document.getElementById('deneme-sayac').textContent=`${appData.denemeler.length} deneme`;
+            if (!appData.denemeler.length) { list.innerHTML='<div style="text-align:center;color:#333;padding:30px;font-size:12px;">Henüz kayıtlı deneme yok.</div>'; return; }
+            const dersAdi={turkce:'TÜR',mat:'MAT',fen:'FEN',ing:'İNG',sos:'SOS',din:'DİN'};
+            list.innerHTML=appData.denemeler.map((d,i)=>`
+                <div class="deneme-card">
+                    <div class="deneme-header"><span class="deneme-adi">${d.adi}</span><span class="deneme-tarih">${d.tarih}</span><span class="deneme-net-badge">NET: ${d.toplamNet.toFixed(2)}</span></div>
+                    <div class="deneme-stats">${dersIds.map(id=>`<div><div class="stat-ders-adi">${dersAdi[id]}</div><div class="stat-net">${(d[id]?.net??0).toFixed(1)}</div><div class="stat-dy">${d[id]?.dogru??0}D/${d[id]?.yanlis??0}Y</div></div>`).join('')}</div>
+                </div>`).join('');
+        }
+
+        let toastTimer;
+        function showToast(){const t=document.getElementById('xp-toast');t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2500);}
+
+        function updateLGSMini(){const days=Math.floor((new Date('June 14, 2026 09:30:00').getTime()-Date.now())/86400000);const el=document.getElementById('lgs-days-mini');if(el)el.textContent=days;}
+
+        /* ── BAŞLANGIÇ ────────────────────────────────────── */
+        applyTheme(); updateHeader(); renderDenemeler(); updateLGSMini();
+        registerPage('deneme');
+    </script>
+</body>
+</html>

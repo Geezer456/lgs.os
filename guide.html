@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Başarım Rehberi · LGS.OS</title>
+    <style>
+        :root {
+            --primary:#ff8800; --primary-glow:rgba(255,136,0,0.6);
+            --bg:#050505; --card:#111; --text:#ddd;
+            --header-bg:#000; --danger:#ff3333;
+            --mc-green:#55ff55; --mc-green-glow:rgba(85,255,85,0.8);
+            --mc-purple:#aa00ff; --mc-gold:#ffaa00; --mc-gold-glow:rgba(255,170,0,0.7);
+        }
+        body.theme-cyan   { --primary:#00f2ff; --primary-glow:rgba(0,242,255,0.6); }
+        body.theme-purple { --primary:#bc13fe; --primary-glow:rgba(188,19,254,0.6); }
+        body.theme-green  { --primary:#39ff14; --primary-glow:rgba(57,255,20,0.6); }
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;transition:.3s;}
+        .top-header{width:100%;height:60px;background:var(--header-bg);border-bottom:2px solid #222;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:1000;}
+        .logo{color:var(--primary);font-weight:bold;font-size:20px;letter-spacing:2px;text-shadow:0 0 10px var(--primary-glow);}
+        button,.nav-link{padding:6px 10px;font-size:10px;border:1px solid var(--primary);background:transparent;color:var(--primary);cursor:pointer;font-weight:bold;transition:.3s;border-radius:12px!important;text-decoration:none;display:inline-block;line-height:normal;white-space:nowrap;}
+        button:hover,.nav-link:hover{background:var(--primary);color:#000;box-shadow:0 0 8px var(--primary-glow);}
+        .nav-link.achievements-link{border-color:var(--mc-green);color:var(--mc-green);box-shadow:0 0 10px var(--mc-green-glow);}
+        .nav-link.achievements-link:hover{background:var(--mc-green);color:#000;}
+        .guide-link-btn{border-color:var(--mc-gold)!important;color:var(--mc-gold)!important;box-shadow:0 0 10px var(--mc-gold-glow)!important;}
+        .guide-link-btn:hover{background:var(--mc-gold)!important;color:#000!important;}
+        .header-stats{display:flex;align-items:center;gap:12px;width:380px;}
+        .lvl-box{font-weight:bold;color:var(--primary);font-size:14px;}
+        .header-xp-container{flex:1;height:10px;background:#222;border-radius:5px;overflow:hidden;border:1px solid #333;}
+        #header-xp-bar{height:100%;background:var(--primary);width:0%;transition:.5s;box-shadow:0 0 8px var(--primary);}
+        .rank-tag{font-size:10px;background:var(--primary);color:#000;padding:2px 6px;border-radius:4px;font-weight:bold;}
+
+        /* ── GUIDE CONTENT ── */
+        .guide-hero{text-align:center;padding:40px 20px 20px;background:linear-gradient(180deg,rgba(255,136,0,.06) 0%,transparent 100%);border-bottom:1px solid #1a1a1a;}
+        .guide-hero h1{font-size:32px;color:var(--primary);text-shadow:0 0 20px var(--primary-glow),0 0 40px var(--primary-glow);letter-spacing:4px;margin-bottom:8px;}
+        .guide-hero p{color:#555;font-size:12px;letter-spacing:2px;}
+        .progress-strip{display:flex;align-items:center;gap:16px;justify-content:center;margin-top:20px;padding:12px 24px;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:12px;display:inline-flex;}
+        .ps-item{display:flex;flex-direction:column;align-items:center;gap:3px;}
+        .ps-val{font-size:20px;font-weight:bold;color:var(--primary);}
+        .ps-lbl{font-size:9px;color:#444;letter-spacing:1px;text-transform:uppercase;}
+        .ps-divider{width:1px;height:30px;background:#222;}
+
+        .guide-toolbar{display:flex;gap:10px;padding:16px 20px;border-bottom:1px solid #111;align-items:center;flex-wrap:wrap;position:sticky;top:60px;background:var(--bg);z-index:100;}
+        .search-box{flex:1;min-width:180px;padding:7px 12px;background:#000;border:1px solid #333;color:#fff;border-radius:12px;font-size:11px;outline:none;transition:.3s;}
+        .search-box:focus{border-color:var(--primary);box-shadow:0 0 8px var(--primary-glow);}
+        .cat-filter{display:flex;gap:6px;flex-wrap:wrap;}
+        .cat-btn{padding:5px 10px;font-size:9px;border:1px solid #333;background:#000;color:#555;cursor:pointer;border-radius:10px;font-weight:bold;letter-spacing:.5px;transition:.2s;}
+        .cat-btn:hover{border-color:var(--primary);color:var(--primary);}
+        .cat-btn.active{background:var(--primary);color:#000;border-color:var(--primary);box-shadow:0 0 8px var(--primary-glow);}
+
+        .guide-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;padding:20px;}
+        .guide-card{background:#0a0a0a;border:1.5px solid #1e1e1e;border-radius:12px;padding:14px;transition:.25s;position:relative;overflow:hidden;animation:fadeIn .3s ease both;}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        .guide-card:hover{border-color:var(--primary);box-shadow:0 0 12px var(--primary-glow);}
+        .guide-card.unlocked{border-color:var(--mc-green);background:rgba(85,255,85,.04);}
+        .guide-card.unlocked:hover{box-shadow:0 0 14px var(--mc-green-glow);}
+        .guide-card.secret-card{border-color:#1a1a1a;}
+        .guide-card.secret-card:hover{border-color:var(--mc-gold);}
+        .guide-card.final-card.unlocked{border-color:var(--mc-purple);background:rgba(170,0,255,.05);}
+        .gc-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+        .gc-icon{font-size:28px;flex-shrink:0;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:#111;border-radius:8px;border:1px solid #222;}
+        .gc-icon.unlocked-icon{border-color:var(--mc-green);background:rgba(85,255,85,.07);box-shadow:0 0 8px var(--mc-green-glow);}
+        .gc-meta{flex:1;}
+        .gc-name{font-size:12px;font-weight:bold;color:#ccc;margin-bottom:3px;}
+        .guide-card.unlocked .gc-name{color:var(--mc-green);}
+        .guide-card.secret-card .gc-name{color:#555;}
+        .gc-badges{display:flex;gap:4px;flex-wrap:wrap;}
+        .badge{font-size:8px;padding:2px 6px;border-radius:6px;font-weight:bold;letter-spacing:.3px;}
+        .b-normal{background:#1a1a1a;color:#444;border:1px solid #222;}
+        .b-zor{background:rgba(255,51,51,.1);color:var(--danger);border:1px solid rgba(255,51,51,.2);}
+        .b-efsa{background:rgba(255,170,0,.1);color:var(--mc-gold);border:1px solid rgba(255,170,0,.2);}
+        .b-gizli{background:rgba(170,0,255,.1);color:var(--mc-purple);border:1px solid rgba(170,0,255,.2);}
+        .b-sis{background:rgba(0,242,255,.1);color:#00f2ff;border:1px solid rgba(0,242,255,.2);}
+        .b-final{background:rgba(170,0,255,.15);color:var(--mc-purple);border:1px solid rgba(170,0,255,.3);}
+        .b-bas{background:rgba(0,255,136,.1);color:var(--mc-green);border:1px solid rgba(0,255,136,.2);}
+        .b-xp{background:rgba(255,136,0,.1);color:var(--primary);border:1px solid rgba(255,136,0,.2);}
+        .gc-divider{height:1px;background:#1a1a1a;margin:10px 0;}
+        .gc-how{font-size:10px;color:#666;line-height:1.6;}
+        .gc-how-title{font-size:8px;color:var(--primary);font-weight:bold;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
+        .gc-unlock-badge{position:absolute;top:10px;right:10px;font-size:9px;padding:2px 6px;border-radius:6px;}
+        .ub-open{background:rgba(85,255,85,.1);color:var(--mc-green);border:1px solid var(--mc-green);}
+        .ub-lock{background:#0a0a0a;color:#2a2a2a;border:1px solid #1a1a1a;}
+        .gc-dep{font-size:9px;color:#333;margin-top:6px;}
+        .gc-dep span{color:#555;}
+
+        .cat-section{padding:10px 20px 0;}
+        .cat-header{display:flex;align-items:center;gap:10px;padding:6px 0;margin-bottom:2px;border-bottom:1px solid #111;}
+        .cat-header h3{font-size:11px;color:#333;letter-spacing:2px;text-transform:uppercase;font-weight:bold;}
+        .cat-count{font-size:9px;color:#222;background:#111;padding:1px 6px;border-radius:6px;}
+
+        .footer-bar{background:#000;border-top:2px solid #1a1a1a;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#333;}
+        .footer-bar span{color:var(--primary);}
+
+        .empty-state{text-align:center;padding:60px;color:#2a2a2a;font-size:13px;}
+    </style>
+</head>
+<body id="mainBody">
+<header class="top-header">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div class="logo">⚡ LGS.OS</div>
+        <a class="nav-link" href="index.html">🏠 ANA SAYFA</a>
+        <button onclick="cycleTheme()">TEMA</button>
+        <a class="nav-link" href="meb.html">📚 MEB KONU</a>
+        <a class="nav-link" href="deneme.html">📊 DENEME</a>
+        <a class="nav-link" href="hiz.html">⚡ HIZ MODU</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+        <a class="nav-link achievements-link" href="achievements.html">🏆 BAŞARIMLAR</a>
+        <div class="header-stats">
+            <span class="rank-tag" id="rank-name">ÇAYLAK</span>
+            <div class="lvl-box">LVL <span id="level">1</span></div>
+            <div class="header-xp-container"><div id="header-xp-bar"></div></div>
+            <div style="font-size:11px;color:var(--primary);font-weight:bold;"><span id="xp-balance">0</span> XP</div>
+        </div>
+    </div>
+</header>
+
+<div class="guide-hero">
+    <h1>📖 BAŞARIM REHBERİ</h1>
+    <p>TÜM 60 BAŞARIMI NASIL KAZANACAĞINI ÖĞRENEBİLİRSİN</p>
+    <div class="progress-strip" id="progress-strip">
+        <div class="ps-item"><div class="ps-val" id="ps-open">0</div><div class="ps-lbl">Açık</div></div>
+        <div class="ps-divider"></div>
+        <div class="ps-item"><div class="ps-val" style="color:#333">60</div><div class="ps-lbl">Toplam</div></div>
+        <div class="ps-divider"></div>
+        <div class="ps-item"><div class="ps-val" id="ps-pct" style="color:var(--mc-gold)">0%</div><div class="ps-lbl">Tamamlandı</div></div>
+        <div class="ps-divider"></div>
+        <div class="ps-item"><div class="ps-val" id="ps-xp" style="color:var(--primary)">0</div><div class="ps-lbl">Toplam XP</div></div>
+    </div>
+</div>
+
+<div class="guide-toolbar">
+    <input type="text" class="search-box" id="searchBox" placeholder="🔍  Başarım ara..." oninput="renderGuide()">
+    <div class="cat-filter" id="catFilter"></div>
+</div>
+
+<div id="guide-content"></div>
+
+<div class="footer-bar">
+    <div>LGS.OS &nbsp;·&nbsp; BAŞARIM REHBERİ &nbsp;·&nbsp; 60 BAŞARIM</div>
+    <div>LGS: <span id="lgs-mini">---</span> GÜN KALDI</div>
+</div>
+
+<script>
+/* ── VERİ ── */
+const STORAGE_KEY='LGS_GAMER_OS_DATA';
+function loadData(){try{const r=localStorage.getItem(STORAGE_KEY);if(r)return JSON.parse(r);}catch(e){}return{xpTotal:0,xpBalance:0,themeIdx:0,achievements:{}};}
+function saveData(d){localStorage.setItem(STORAGE_KEY,JSON.stringify(d));}
+let appData=loadData();
+if(!appData.achievements)appData.achievements={};
+
+const THEME=['','theme-cyan','theme-purple','theme-green'];
+function applyTheme(){document.body.className=THEME[appData.themeIdx]||'';}
+function cycleTheme(){appData.themeIdx=(appData.themeIdx+1)%THEME.length;saveData(appData);applyTheme();}
+function updateHeader(){
+    const lvl=Math.floor(appData.xpTotal/100)+1;
+    document.getElementById('level').innerText=lvl;
+    document.getElementById('xp-balance').innerText=appData.xpBalance;
+    document.getElementById('header-xp-bar').style.width=(appData.xpTotal%100)+'%';
+    const ranks=['ÇAYLAK','DENEYİMLİ','USTA','FENLİSELİ','EFSANE'];
+    document.getElementById('rank-name').innerText=ranks[Math.min(lvl-1,4)];
+}
+
+/* ── BAŞARIM VERİSİ ── */
+const ACH_XP={'crafting-table':10,'stone-age':20,'iron-armor':30,'diamond-ore':50,'enchanting':75,'dragon-breath':100,'speedrunner':40,'invis-potion':60,'firin-ustasi':15,'potion-master':35,'trade-center':50,'haritaci':25,'redstone-eng':30,'beacon-light':80,'villager-friend':25,'world-traveler':20,'monster-hunter':20,'wither-slayer':60,'hardcore-mode':90,'lgs-slayer':200,'redstone-math':40,'enchant-translator':45,'brewing-science':25,'ancient-history':80,'wandering-english':20,'totem-religion':40,'speed-potion-2':15,'mending-book':35,'phantom-hunter':50,'sunrise-clock':20,'mining-fatigue':70,'respawn-anchor':45,'emerald-block':90,'item-frame':20,'dye-crafter':25,'unbreaking-3':100,'the-void':30,'netherite-upgrade':60,'warden-slayer':85,'elytra-flight':50,'campfire-rest':25,'clock-sync':40,'spyglass-focus':45,'glowstone-night':55,'slimeball-stuck':10,'observer-stats':20,'golden-apple':40,'enchanted-apple':100,'shield-defense':35,'anvil-repair':40,'compass-nav':25,'shulker-box':20,'note-block':15,'command-block':15,'jukebox-party':30,'bookshelf-meb':90,'ender-pearl':70,'chorus-fruit':35,'trident-loyalty':120,'nether-star':150};
+
+/* Kategori | Başarım ID | İkon | İsim | Zorluk | Nasıl Kazanılır | Bağımlılık */
+const CATS=[
+    {id:'baslangic',name:'🚀 BAŞLANGIÇ',color:'var(--mc-green)'},
+    {id:'deneme',name:'📊 DENEME & NET',color:'var(--primary)'},
+    {id:'hiz',name:'⚡ HIZ MODU',color:'#00f2ff'},
+    {id:'meb',name:'📚 MEB & DERS',color:'#bc13fe'},
+    {id:'odak',name:'⏱️ ODAK & ZAMAN',color:'var(--mc-gold)'},
+    {id:'market',name:'🛒 MARKET & XP',color:'#39ff14'},
+    {id:'sistem',name:'⚙️ SİSTEM & PLAN',color:'var(--primary)'},
+    {id:'streak',name:'🔥 STREAK & GİRİŞ',color:'var(--danger)'},
+    {id:'ozellik',name:'🧰 ÖZELLİKLER',color:'#00f2ff'},
+    {id:'boss',name:'👑 BOSS & FİNAL',color:'var(--mc-purple)'},
+];
+
+const ACHS=[
+    /* ── BAŞLANGIÇ ── */
+    {id:'crafting-table',cat:'baslangic',icon:'🪵',name:'Odun Çağı',tip:'Başlangıç',
+     how:'Haftalık plana herhangi bir ders yaz VEYA görev listesine bir görev ekle VEYA MEB\'de herhangi bir tick kutusunu işaretle.',
+     dep:null},
+    {id:'stone-age',cat:'baslangic',icon:'⛏️',name:'Taş Devri',tip:'Normal',
+     how:'Ana sayfadaki görev listesinden toplam 10 görevi BİTİR butonuna basarak tamamla. Boss görevler de sayılır.',
+     dep:'crafting-table'},
+    {id:'slimeball-stuck',cat:'baslangic',icon:'🟩',name:'Balçık Topu',tip:'Başlangıç',
+     how:'Ana sayfadaki 🧰 Soru Kumbarası özelliğini aç ve bir soruyu "Sorulacaklar" listesine ekle. İlk ekleme bu başarımı tetikler.',
+     dep:'crafting-table'},
+    {id:'firin-ustasi',cat:'baslangic',icon:'🍞',name:'Fırıncı',tip:'Normal',
+     how:'Ana sayfadaki Marketten 🍕 YEMEK veya 🍫 SNACK seçeneklerinden herhangi birini satın al. XP\'in yeterli olması gerekir.',
+     dep:'crafting-table'},
+    {id:'monster-hunter',cat:'baslangic',icon:'⚔️',name:'Canavar Avcısı',tip:'Normal',
+     how:'Ana sayfada görev eklerken "BOSS" butonuyla bir Boss görevi oluştur. Sonra bu görevi "BİTİR" ile tamamla.',
+     dep:'crafting-table'},
+    {id:'item-frame',cat:'baslangic',icon:'🖼️',name:'Koleksiyoncu',tip:'Normal',
+     how:'Marketten 5 FARKLI kategoride alışveriş yap: ☕ İçecek, 🎮 Oyun, 📱 Sosyal, 🍕 Yemek kategorilerini dene. 🎲 Şans da sayılır.',
+     dep:'firin-ustasi'},
+
+    /* ── DENEME & NET ── */
+    {id:'iron-armor',cat:'deneme',icon:'🛡️',name:'Demir Zırh',tip:'Normal',
+     how:'Deneme Analizi sayfasında tek bir denemede toplam NET skoru 50.00 ve üzerine çıkar. 6 ders ortalaması.',
+     dep:'stone-age'},
+    {id:'diamond-ore',cat:'deneme',icon:'💎',name:'ELMAS!!!',tip:'Zor',
+     how:'Deneme Analizi sayfasında tek bir denemede toplam NET skoru 80.00 üstüne çıkar. LGS ortalamasına yakın bir skor!',
+     dep:'iron-armor'},
+    {id:'respawn-anchor',cat:'deneme',icon:'⚓',name:'Yeniden Doğma Çapası',tip:'Gizli',
+     how:'Kayıtlı iki deneme arasında en az 20 NET artışı sağla. Örn: 40 netten 60 nete çıkarsan tetiklenir.',
+     dep:'diamond-ore'},
+    {id:'netherite-upgrade',cat:'deneme',icon:'🪨',name:'Netherit Yükseltmesi',tip:'Zor',
+     how:'Son kaydettiğin 3 denemede HEPSİNDE 80 net üstü skoru sağla. Üst üste 3 kez 80+ olmak lazım.',
+     dep:'diamond-ore'},
+    {id:'glowstone-night',cat:'deneme',icon:'💡',name:'Işıktaşı',tip:'Gizli',
+     how:'Gece yarısı 00:00 ile 02:00 arasında Deneme Analizi sayfasına gir ve 50+ netli bir deneme kaydet.',
+     dep:'phantom-hunter'},
+    {id:'golden-apple',cat:'deneme',icon:'🍎',name:'Altın Elma',tip:'Zor',
+     how:'Önceki denemene göre toplam net skorun 5+ artmış olsun. Sistem bunu toparlanma olarak sayar.',
+     dep:'respawn-anchor'},
+    {id:'enchanted-apple',cat:'deneme',icon:'🌟',name:'Büyülü Altın Elma',tip:'Efsanevi',
+     how:'Tek bir günde deneme sayfasına girdiğin tüm sorular (doğru+yanlış) toplamda 500\'i aşsın. Birden fazla deneme ekleyerek ulaşabilirsin.',
+     dep:'golden-apple'},
+    {id:'shield-defense',cat:'deneme',icon:'🛡️',name:'Kalkan',tip:'Zor',
+     how:'Önceki denemende en fazla yanlış yaptığın derste, sonraki denemende o dersin yanlışlarını yarıya indir.',
+     dep:'enchanted-apple'},
+    {id:'nether-star',cat:'deneme',icon:'⭐',name:'Nether Yıldızı',tip:'Final',
+     how:'Deneme Analizi sayfasında deneme adına "TÜRKİYE GENELİ" veya "TG" ibaresini içeren bir deneme kaydet. Sistem bunu otomatik algılar.',
+     dep:'trident-loyalty'},
+
+    /* ── HIZ MODU ── */
+    {id:'speedrunner',cat:'hiz',icon:'⚡',name:'Speedrunner',tip:'Zor',
+     how:'Hız Modunda 20 soruluk bir seçim yap, 10 dakikadan az sürede bitir ve en az 20 doğru işaretle.',
+     dep:'iron-armor'},
+    {id:'speed-potion-2',cat:'hiz',icon:'☄️',name:'Hız İksiri II',tip:'Normal',
+     how:'Hız Modunda en az 5 soruluk bir oturumu soru başına ortalama 15 saniyenin altında tamamla.',
+     dep:'speedrunner'},
+    {id:'elytra-flight',cat:'hiz',icon:'🪽',name:'Elytra',tip:'Zor',
+     how:'Hız Modunda 50 soruluk bir oturumu HİÇ YANLIŞSIZ ve HİÇ BOŞ BIRAKMADAN tamamla.',
+     dep:'speedrunner'},
+    {id:'ender-pearl',cat:'hiz',icon:'🔮',name:'Ender İncisi',tip:'Efsanevi',
+     how:'Hız Modunda 10 soruluk bir oturumu 5 dakikanın altında bitir ve en az 8 doğru işaretle.',
+     dep:'speedrunner'},
+    {id:'mending-book',cat:'hiz',icon:'🛠️',name:'Tamir Büyüsü',tip:'Zor',
+     how:'İki ardışık oturumda doğru oranın artmasını sağla ve yanlış sayını azalt. Sistem kümülatif olarak takip eder.',
+     dep:'speedrunner'},
+    {id:'spyglass-focus',cat:'hiz',icon:'🔭',name:'Dürbün',tip:'Zor',
+     how:'Hız Modunda aynı ders seçimiyle toplamda 150 doğru soruya ulaş. Birden fazla oturumla birikir.',
+     dep:'mining-fatigue'},
+    {id:'anvil-repair',cat:'hiz',icon:'🗜️',name:'Örs',tip:'Zor',
+     how:'Hız Modunda ders seçimini "ZOR" olarak ayarla ve bu modda 5 farklı oturum tamamla.',
+     dep:'shield-defense'},
+
+    /* ── MEB & DERS ── */
+    {id:'enchanting',cat:'meb',icon:'📖',name:'Büyü Masası',tip:'Zor',
+     how:'Hız Modu ve Deneme sayfalarındaki toplam işaretlenmiş soru sayısı 1000\'i aşsın. Sabır gerektiren bir başarım!',
+     dep:'diamond-ore'},
+    {id:'dragon-breath',cat:'meb',icon:'🐲',name:'Ejderha Nefesi',tip:'Efsanevi',
+     how:'MEB Konu Takip sayfasındaki TÜM 6 dersin TÜM 8 konusunu eksiksiz tamamla (Konu+Tekrar+Test+Deneme tick\'leri).',
+     dep:'enchanting'},
+    {id:'bookshelf-meb',cat:'meb',icon:'📚',name:'Kitaplık',tip:'Efsanevi',
+     how:'MEB Konu Takip sayfasındaki 48 konunun en az yarısını (24 konu) tamamen bitir.',
+     dep:'dragon-breath'},
+    {id:'ancient-history',cat:'meb',icon:'📜',name:'Antik Kalıntı',tip:'Efsanevi',
+     how:'MEB Konu Takip sayfasında SOSYAL BİLİMLER dersinin tüm 8 konusunu eksiksiz tamamla.',
+     dep:'dragon-breath'},
+    {id:'warden-slayer',cat:'meb',icon:'👹',name:'Warden Avcısı',tip:'Efsanevi',
+     how:'MEB Konu Takip sayfasında her dersin son 2 konusunu (index 6 ve 7) tüm dersler için tamamla. En zor konular bunlar!',
+     dep:'dragon-breath'},
+    {id:'redstone-math',cat:'meb',icon:'📐',name:'Kızıltaş Hesap M.',tip:'Zor',
+     how:'Deneme Analizi sayfasına girdiğin tüm denemeler toplamında Matematik bölümünden 100 doğru soruya ulaş.',
+     dep:'stone-age'},
+    {id:'enchant-translator',cat:'meb',icon:'📖',name:'Büyü Çevirmeni',tip:'Zor',
+     how:'Deneme Analizi\'nde Türkçe bölümünde HİÇ YANLIŞ YAPMADAN tamamlanan 3 farklı deneme kaydet.',
+     dep:'stone-age'},
+    {id:'brewing-science',cat:'meb',icon:'🧪',name:'İksir Tezgahı',tip:'Normal',
+     how:'Deneme Analizi\'nde tüm denemelerin Fen Bilimleri bölümündeki toplam soru sayısı (doğru+yanlış) 50\'yi aşsın.',
+     dep:'potion-master'},
+    {id:'wandering-english',cat:'meb',icon:'🌍',name:'Gezgin Tüccar',tip:'Normal',
+     how:'Deneme Analizi\'ne İngilizce sorularından toplam XP değeri 500\'i geçsin. Her İngilizce sorusu 5 XP sayılır.',
+     dep:'haritaci'},
+    {id:'totem-religion',cat:'meb',icon:'🌙',name:'Ölümsüzlük Totemi',tip:'Zor',
+     how:'Deneme Analizi\'nde Din Kültürü bölümünde HİÇ YANLIŞ YAPMADAN arka arkaya 5 deneme kaydet.',
+     dep:'dragon-breath'},
+    {id:'chorus-fruit',cat:'meb',icon:'🌺',name:'Koro Meyvesi',tip:'Gizli',
+     how:'Hız Modunda en az sevdiğin veya az çalıştığın dersi seç ve o derste 2 farklı oturumu tamamla.',
+     dep:'brewing-science'},
+
+    /* ── ODAK & ZAMAN ── */
+    {id:'invis-potion',cat:'odak',icon:'🌫️',name:'Görünmezlik İksiri',tip:'Gizli',
+     how:'Ana sayfadaki Odak zamanlayıcısını 120 dakika (2 saat) olarak ayarla ve kesintisiz çalıştır. Sayaç bittiğinde tetiklenir.',
+     dep:'speedrunner'},
+    {id:'campfire-rest',cat:'odak',icon:'🔥',name:'Kamp Ateşi',tip:'Normal',
+     how:'Ana sayfadaki Odak zamanlayıcısını 25 dakikalık Pomodoro olarak kullan. 4 kez 25 dakika çalışınca tetiklenir.',
+     dep:'invis-potion'},
+    {id:'mining-fatigue',cat:'odak',icon:'⛏️',name:'Madenci Yorgunluğu',tip:'Efsanevi',
+     how:'Ana sayfadaki Odak zamanlayıcısını 180 dakika (3 saat) veya üzeri ayarla ve tamamla. Tek oturumda!',
+     dep:'invis-potion'},
+    {id:'phantom-hunter',cat:'odak',icon:'🦇',name:'Fantom Avcısı',tip:'Gizli',
+     how:'Gece 22:00 ile sabah 05:00 arasında Odak zamanlayıcısını başlat ve 60 dakika çalışınca tamamla.',
+     dep:'invis-potion'},
+    {id:'sunrise-clock',cat:'odak',icon:'🌅',name:'Gündoğumu',tip:'Normal',
+     how:'Sabah 07:00\'den önce sisteme giriş yap ve o gün herhangi bir görevi tamamla.',
+     dep:'villager-friend'},
+    {id:'clock-sync',cat:'odak',icon:'⏰',name:'Saat',tip:'Zor',
+     how:'3 gün üst üste sabah 09:00\'dan önce sisteme giriş yap. Sistem günlük ilk giriş saatini kaydeder.',
+     dep:'villager-friend'},
+    {id:'the-void',cat:'odak',icon:'🌌',name:'Hiçlik (The Void)',tip:'Gizli',
+     how:'Ana sayfadaki ⚫ The Void butonuna bas ve "Ekstra konu çalıştım!" onayını ver. Plansız çalışma sayılır.',
+     dep:'redstone-eng'},
+
+    /* ── MARKET & XP ── */
+    {id:'potion-master',cat:'market',icon:'🧪',name:'İksir Ustası',tip:'Normal',
+     how:'Ana sayfadaki Marketten ☕ KAHVE seçeneğini 10 kez satın al. Her alışveriş 50 XP tutar.',
+     dep:'firin-ustasi'},
+    {id:'trade-center',cat:'market',icon:'💰',name:'Ticaret Merkezi',tip:'Normal',
+     how:'Marketten yapılan toplam XP harcaması 2000\'i aşsın. Tüm market alışverişleri sayılır.',
+     dep:'potion-master'},
+    {id:'emerald-block',cat:'market',icon:'🟩',name:'Zümrüt Bloğu',tip:'Efsanevi',
+     how:'Cüzdanındaki (harcamadığın) XP bakiyesi aynı anda 5000\'e ulaşsın. Biriktir, harcama!',
+     dep:'trade-center'},
+    {id:'jukebox-party',cat:'market',icon:'📻',name:'Müzik Kutusu',tip:'Normal',
+     how:'Haftalık plan bloklarını doldur ve "Haftalık Hedef Tamamla" butonuna bas. 7 günün tümü dolu olmalı.',
+     dep:'redstone-eng'},
+    {id:'dye-crafter',cat:'market',icon:'🎨',name:'Boya Ustası',tip:'Sistemsel',
+     how:'Header\'daki TEMA butonuna 4 kez bas. Turuncu → Cyan → Mor → Yeşil → Turuncu... tüm 4 temayı kullanman gerekiyor.',
+     dep:'haritaci'},
+
+    /* ── SİSTEM & PLAN ── */
+    {id:'haritaci',cat:'sistem',icon:'🗺️',name:'Haritacı',tip:'Sistemsel',
+     how:'5 sayfanın hepsini ziyaret et: Ana Sayfa, MEB Konu, Deneme Analizi, Hız Modu ve Başarımlar sayfaları.',
+     dep:'crafting-table'},
+    {id:'redstone-eng',cat:'sistem',icon:'⚙️',name:'Kızıltaş Mühendisi',tip:'Normal',
+     how:'Haftalık Plan tablosundaki 7 günün her birine en az 2 ders yaz (toplam 14 hücre dolu olmalı).',
+     dep:'haritaci'},
+    {id:'compass-nav',cat:'sistem',icon:'🧭',name:'Pusula',tip:'Sistemsel',
+     how:'Haftalık planı ilk kez eksiksiz oluştur ve "Haftalık Programı Kaydet" eylemine tamamla. redstone-eng ile paralel tetiklenir.',
+     dep:'redstone-eng'},
+    {id:'observer-stats',cat:'sistem',icon:'👁️',name:'Gözlemci',tip:'Normal',
+     how:'Ana sayfadaki 👁️ Hata Analizi Timer butonuna bas ve 10 dakika boyunca analiz modunu çalıştır.',
+     dep:'slimeball-stuck'},
+    {id:'shulker-box',cat:'sistem',icon:'🧰',name:'Shulker Kutusu',tip:'Normal',
+     how:'Ana sayfadaki 🧰 Soru Kumbarası\'na toplam 50 farklı soru kaydet. Her kayıt sayılır.',
+     dep:'compass-nav'},
+    {id:'world-traveler',cat:'sistem',icon:'🌍',name:'Dünya Gezgini',tip:'Gizli',
+     how:'Başarımlar haritası sayfasını toplam 50 kez aç. Günde birkaç kez ziyaret ederek sayacı artırabilirsin.',
+     dep:'villager-friend'},
+
+    /* ── STREAK & GİRİŞ ── */
+    {id:'villager-friend',cat:'streak',icon:'🧑‍🌾',name:'Köylü Dostu',tip:'Normal',
+     how:'5 gün üst üste sistemi ziyaret et. Her gün en az bir kez herhangi bir sayfayı aç.',
+     dep:'beacon-light'},
+    {id:'beacon-light',cat:'streak',icon:'🗼',name:'Fener (Beacon)',tip:'Efsanevi',
+     how:'Toplam XP\'in 900\'ü geçsin (10. Seviyeye ulaş). Görev tamamlama, deneme ve MEB tick\'leriyle XP biriktirebilirsin.',
+     dep:'redstone-eng'},
+    {id:'unbreaking-3',cat:'streak',icon:'🛡️',name:'Kırılmazlık III',tip:'Efsanevi',
+     how:'30 gün boyunca her gün sistemi ziyaret et. Tek gün bile atlayamazsın!',
+     dep:'villager-friend'},
+    {id:'trident-loyalty',cat:'streak',icon:'🔱',name:'Sadakat Mızrağı',tip:'Efsanevi',
+     how:'60 gün boyunca her gün kesintisiz giriş yap. LGS\'e tam bağlılık gerektirir!',
+     dep:'unbreaking-3'},
+    {id:'hardcore-mode',cat:'streak',icon:'💔',name:'Hardcore Mod',tip:'Gizli',
+     how:'7 gün boyunca her gün en az bir görevi tamamla. Tek gün bile görevsiz geçirme.',
+     dep:'wither-slayer'},
+
+    /* ── ÖZELLİKLER ── */
+    {id:'command-block',cat:'ozellik',icon:'⚙️',name:'Komut Bloğu',tip:'Sistemsel',
+     how:'Ana sayfadaki ⚙️ Ayarlar butonunu aç ve 3 farklı ayarı değiştir (tema, bildirim sesi, zamanlayıcı varsayılanı gibi).',
+     dep:'dye-crafter'},
+    {id:'note-block',cat:'ozellik',icon:'🎵',name:'Nota Bloğu',tip:'Sistemsel',
+     how:'Ana sayfadaki 🎵 Lofi Player\'ı aç ve müziği 10 kez başlat/aktifleştir.',
+     dep:'campfire-rest'},
+
+    /* ── BOSS & FİNAL ── */
+    {id:'wither-slayer',cat:'boss',icon:'💀',name:'Wither Avcısı',tip:'Zor',
+     how:'Ana sayfada toplamda 10 BOSS görevi tamamla. Boss görev oluştururken kırmızı "BOSS" butonunu kullan.',
+     dep:'monster-hunter'},
+    {id:'hardcore-mode',cat:'boss',icon:'💔',name:'Hardcore Mod',tip:'Gizli',
+     how:'7 gün boyunca her gün en az bir görevi tamamla. Tek gün bile görevsiz geçirme.',
+     dep:'wither-slayer'},
+    {id:'lgs-slayer',cat:'boss',icon:'👑',name:'LGS Slayer',tip:'Final',
+     how:'Diğer tüm 59 başarımı aç. Sistem otomatik olarak bunu verir. LGS hazırlığını zirveye taşı!',
+     dep:'dragon-breath'},
+];
+
+/* hardcore-mode iki yerde var, kaldır */
+const uniqueAchs = ACHS.filter((a,i,arr)=>arr.findIndex(b=>b.id===a.id)===i);
+
+let activeFilter='all';
+
+function renderGuide(){
+    const search=document.getElementById('searchBox').value.toLowerCase();
+    const content=document.getElementById('guide-content');
+    content.innerHTML='';
+
+    const ach=appData.achievements||{};
+    let totalOpen=0, totalXP=0;
+    Object.keys(ACH_XP).forEach(id=>{ if(ach[id]){totalOpen++;totalXP+=ACH_XP[id]||0;} });
+    document.getElementById('ps-open').textContent=totalOpen;
+    document.getElementById('ps-pct').textContent=Math.round(totalOpen/60*100)+'%';
+    document.getElementById('ps-xp').textContent=totalXP;
+
+    const filtered=uniqueAchs.filter(a=>{
+        if(activeFilter!=='all' && a.cat!==activeFilter) return false;
+        if(search && !a.name.toLowerCase().includes(search) && !a.how.toLowerCase().includes(search) && !a.id.includes(search)) return false;
+        return true;
+    });
+
+    if(!filtered.length){
+        content.innerHTML='<div class="empty-state">🔍 Aramanla eşleşen başarım bulunamadı.</div>';
+        return;
+    }
+
+    const catGroups={};
+    filtered.forEach(a=>{
+        if(!catGroups[a.cat]) catGroups[a.cat]=[];
+        catGroups[a.cat].push(a);
+    });
+
+    CATS.forEach(cat=>{
+        const items=catGroups[cat.id];
+        if(!items||!items.length) return;
+
+        const sec=document.createElement('div');
+        sec.className='cat-section';
+        let delay=0;
+        sec.innerHTML=`<div class="cat-header"><h3 style="color:${cat.color}">${cat.name}</h3><span class="cat-count">${items.length}</span></div>`;
+        content.appendChild(sec);
+
+        const grid=document.createElement('div');
+        grid.className='guide-grid';
+
+        items.forEach(a=>{
+            const isOpen=!!ach[a.id];
+            const isSecret=['Gizli','Final'].includes(a.tip);
+            const isFinal=a.tip==='Final';
+            const xp=ACH_XP[a.id]||0;
+            const tipBadge={'Normal':'b-normal','Başlangıç':'b-bas','Zor':'b-zor','Efsanevi':'b-efsa','Gizli':'b-gizli','Sistemsel':'b-sis','Final':'b-final'}[a.tip]||'b-normal';
+
+            const card=document.createElement('div');
+            card.className=`guide-card${isOpen?' unlocked':''}${isFinal?' final-card':''}${isSecret&&!isOpen?' secret-card':''}`;
+            card.style.animationDelay=`${delay*0.04}s`;
+            delay++;
+
+            card.innerHTML=`
+                <div class="gc-unlock-badge ${isOpen?'ub-open':'ub-lock'}">${isOpen?'✅ AÇIK':'🔒'}</div>
+                <div class="gc-top">
+                    <div class="gc-icon ${isOpen?'unlocked-icon':''}">${a.icon}</div>
+                    <div class="gc-meta">
+                        <div class="gc-name">${a.name}</div>
+                        <div class="gc-badges">
+                            <span class="badge ${tipBadge}">${a.tip}</span>
+                            <span class="badge b-xp">+${xp} XP</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="gc-divider"></div>
+                <div class="gc-how-title">⚔️ NASIL KAZANILIR?</div>
+                <div class="gc-how">${a.how}</div>
+                ${a.dep?`<div class="gc-dep">🔗 Önce açılması gereken: <span>${a.dep}</span></div>`:''}
+            `;
+            grid.appendChild(card);
+        });
+
+        content.appendChild(grid);
+    });
+}
+
+function buildCatFilter(){
+    const cf=document.getElementById('catFilter');
+    const allBtn=document.createElement('div');
+    allBtn.className='cat-btn active';allBtn.textContent='TÜM';
+    allBtn.onclick=()=>{activeFilter='all';document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));allBtn.classList.add('active');renderGuide();};
+    cf.appendChild(allBtn);
+
+    CATS.forEach(cat=>{
+        const btn=document.createElement('div');
+        btn.className='cat-btn';
+        btn.textContent=cat.name;
+        btn.onclick=()=>{activeFilter=cat.id;document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderGuide();};
+        cf.appendChild(btn);
+    });
+}
+
+function updateLGSMini(){
+    const days=Math.floor((new Date('June 14, 2026 09:30:00').getTime()-Date.now())/86400000);
+    document.getElementById('lgs-mini').textContent=days;
+}
+
+/* ── BAŞLANGIÇ ── */
+applyTheme(); updateHeader(); buildCatFilter(); renderGuide(); updateLGSMini();
+</script>
+</body>
+</html>

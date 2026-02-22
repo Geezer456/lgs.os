@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LGS.OS — Ana Sayfa</title>
+    <style>
+        :root {
+            --primary: #ff8800;
+            --primary-glow: rgba(255, 136, 0, 0.6);
+            --bg: #050505;
+            --card: #111;
+            --text: #ddd;
+            --accent: #00ff88;
+            --header-bg: #000;
+            --danger: #ff3333;
+            --mc-green: #55ff55;
+            --mc-green-glow: rgba(85, 255, 85, 0.8);
+            --mc-purple: #aa00ff;
+            --mc-gold: #ffaa00;
+        }
+        body.theme-cyan   { --primary: #00f2ff; --primary-glow: rgba(0,242,255,0.6); }
+        body.theme-purple { --primary: #bc13fe; --primary-glow: rgba(188,19,254,0.6); }
+        body.theme-green  { --primary: #39ff14; --primary-glow: rgba(57,255,20,0.6); }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-y: auto;
+            transition: 0.3s;
+        }
+        .top-header {
+            width: 100%; height: 60px;
+            background-color: var(--header-bg);
+            border-bottom: 2px solid #222;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; position: sticky; top: 0; z-index: 1000;
+        }
+        .logo { color: var(--primary); font-weight: bold; font-size: 20px; letter-spacing: 2px; text-shadow: 0 0 10px var(--primary-glow); }
+        .header-stats { display: flex; align-items: center; gap: 12px; width: 380px; }
+        .lvl-box { font-weight: bold; color: var(--primary); font-size: 14px; }
+        .header-xp-container { flex: 1; height: 10px; background: #222; border-radius: 5px; overflow: hidden; border: 1px solid #333; }
+        #header-xp-bar { height: 100%; background: var(--primary); width: 0%; transition: 0.5s; box-shadow: 0 0 8px var(--primary); }
+        .rank-tag { font-size: 10px; background: var(--primary); color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+
+        button, .nav-link {
+            padding: 6px 10px; font-size: 10px;
+            border: 1px solid var(--primary); background: transparent;
+            color: var(--primary); cursor: pointer; font-weight: bold;
+            transition: 0.3s; border-radius: 12px !important;
+            text-decoration: none; display: inline-block; line-height: normal; white-space: nowrap;
+        }
+        button:hover, .nav-link:hover { background: var(--primary); color: #000; box-shadow: 0 0 8px var(--primary-glow); }
+        .nav-link.achievements-link { border-color: var(--mc-green); color: var(--mc-green); box-shadow: 0 0 10px var(--mc-green-glow); }
+        .nav-link.achievements-link:hover { background: var(--mc-green); color: #000; }
+
+        .main-wrapper { display: flex; padding: 15px; gap: 15px; }
+        .container, .daily-todo, .status-footer-bar, .market-item, button, input, td, th, select { border-radius: 12px !important; }
+        .left-panel { width: 38%; display: flex; flex-direction: column; gap: 15px; }
+        .weekly-plan-container { background: var(--card); padding: 15px; border: 2px solid #222; }
+        table { width: 100%; border-collapse: separate; border-spacing: 2px; table-layout: fixed; }
+        th, td { border: 1px solid #333; padding: 8px 4px; text-align: center; font-size: 11px; }
+        th { background: #1a1a1a; color: var(--primary); }
+        .daily-todo { background: var(--card); border: 2px solid #222; padding: 15px; min-height: 250px; }
+        .right-panel { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+        .top-row { display: flex; gap: 12px; height: 210px; }
+        .container {
+            background: var(--card); border: 2px solid #222; padding: 15px;
+            transition: all 0.3s ease;
+        }
+        .container:hover { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow), inset 0 0 10px var(--primary-glow); }
+        .market-box { flex: 1.3; }
+        .market-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+        .market-item { background: #000; border: 1px solid var(--primary); padding: 6px 2px; text-align: center; cursor: pointer; min-height: 45px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+        .market-item:hover { background: var(--primary); color: #000; box-shadow: 0 0 10px var(--primary); }
+        .timer-box { flex: 0.7; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        #timer-display { font-size: 44px; color: var(--primary); font-family: monospace; margin: 5px 0; text-shadow: 0 0 15px var(--primary-glow); }
+        .tasks-box { flex: 1; min-height: 200px; }
+        input[type="text"], input[type="number"], select { background: #000; border: 1px solid #333; color: #fff; padding: 6px; font-size: 11px; }
+        .boss-btn { border-color: var(--danger); color: var(--danger); }
+        .boss-btn:hover { background: var(--danger); color: #fff; box-shadow: 0 0 10px var(--danger); }
+        .status-footer-bar { display: flex; flex-direction: column; gap: 8px; background: var(--card); padding: 12px 20px; border: 2px solid #222; margin-top: auto; transition: all 0.3s ease; }
+        .status-footer-bar:hover { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow), inset 0 0 10px var(--primary-glow); }
+        .lgs-bar-bg { width: 100%; height: 10px; background: #222; border-radius: 5px; overflow: hidden; border: 1px solid #333; }
+        #lgs-bar-fill { height: 100%; background: var(--primary); transition: 0.5s; width: 100%; box-shadow: 0 0 5px var(--primary); }
+    </style>
+</head>
+<body id="mainBody">
+    <header class="top-header">
+        <div style="display:flex; align-items:center; gap:15px;">
+            <div class="logo">⚡ LGS.OS</div>
+            <a class="nav-link" href="index.html">🏠 ANA SAYFA</a>
+            <button onclick="cycleTheme()">TEMA</button>
+            <a class="nav-link" href="meb.html">📚 MEB KONU</a>
+            <a class="nav-link" href="deneme.html">📊 DENEME</a>
+            <a class="nav-link" href="hiz.html">⚡ HIZ MODU</a>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <a class="nav-link achievements-link" href="achievements.html">🏆 BAŞARIMLAR</a>
+            <div class="header-stats">
+                <span class="rank-tag" id="rank-name">ÇAYLAK</span>
+                <div class="lvl-box">LVL <span id="level">1</span></div>
+                <div class="header-xp-container"><div id="header-xp-bar"></div></div>
+                <div style="font-size:11px; color:var(--primary); font-weight:bold;"><span id="xp-balance">0</span> XP</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-wrapper" id="main-dashboard">
+        <div class="left-panel">
+            <div class="container weekly-plan-container">
+                <h5 style="margin:0 0 10px 0;">📅 HAFTALIK PLAN</h5>
+                <table>
+                    <thead><tr><th>GÜN</th><th>DERS 1</th><th>MOLA</th><th>DERS 2</th><th>MOLA</th></tr></thead>
+                    <tbody id="plan-body"></tbody>
+                </table>
+            </div>
+            <div class="daily-todo container">
+                <h5 style="margin:0 0 10px 0;">📝 GÜNLÜK LİSTE</h5>
+                <div style="display:flex; gap:5px; margin-bottom:10px;">
+                    <input type="text" id="todoInput" placeholder="Görev..." style="flex:1;">
+                    <button onclick="addTodo()">EKLE</button>
+                </div>
+                <div id="todoList"></div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="top-row">
+                <div class="container market-box">
+                    <h5 style="margin:0;">🛒 MARKET</h5>
+                    <div class="market-grid">
+                        <!-- Kahve: potion-master sayacına dahil, firin-ustasi yok -->
+                        <div class="market-item" onclick="buy(50,'drink')"><span>☕ KAHVE (50)</span></div>
+                        <div class="market-item" onclick="buy(300,'fun')"><span>🎮 OYUN (300)</span></div>
+                        <div class="market-item" onclick="buy(150,'fun')"><span>📱 SOSYAL (150)</span></div>
+                        <!-- Yemek: firin-ustasi tetikler -->
+                        <div class="market-item" onclick="buy(200,'food')"><span>🍕 YEMEK (200)</span></div>
+                        <div class="market-item" onclick="buy(100,'food')"><span>🍫 SNACK (100)</span></div>
+                        <div class="market-item" onclick="luckRoll()"><span>🎲 ŞANS (10)</span></div>
+                    </div>
+                </div>
+                <div class="container timer-box">
+                    <h5 style="margin:0;">⏳ ODAK</h5>
+                    <div id="timer-display">25:00</div>
+                    <div style="display:flex; gap:3px; justify-content:center;">
+                        <input type="number" id="timer-min" value="25" style="width:30px;">
+                        <button onclick="setTimer()">SET</button>
+                        <button onclick="startTimer()">GO</button>
+                        <button onclick="stopTimer()">X</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container tasks-box">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <h5 style="margin:0;">🎯 AKTİF GÖREVLER</h5>
+                    <div style="display:flex; gap:5px;">
+                        <button onclick="resetDaily()" style="font-size:8px; border-color:#444; color:#444;">TEMİZLE</button>
+                        <button onclick="killerMode()" class="boss-btn" style="font-size:8px;">💀 KILLER</button>
+                    </div>
+                </div>
+                <div style="display:flex; gap:5px; margin-bottom:12px;">
+                    <input type="text" id="taskInput" placeholder="Yeni görev..." style="flex:1;">
+                    <button onclick="addTask(false)">LİSTELE</button>
+                    <button class="boss-btn" onclick="addTask(true)">BOSS</button>
+                </div>
+                <div id="taskList"></div>
+            </div>
+
+            <div class="status-footer-bar">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="font-size:13px; font-weight:bold;">
+                        🏁 LGS: <span id="lgs-days" style="color:var(--primary); text-shadow:0 0 5px var(--primary-glow);">---</span> GÜN
+                    </div>
+                    <div id="lgs-status-text" style="font-size:9px; color:#555;">SYSTEM ONLINE</div>
+                </div>
+                <div class="lgs-bar-bg"><div id="lgs-bar-fill"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ══════════════════════════════════════════════════════
+           VERİ KATMANI — LGS_GAMER_OS_DATA (tek anahtar)
+        ══════════════════════════════════════════════════════ */
+        const STORAGE_KEY = 'LGS_GAMER_OS_DATA';
+
+        function loadData() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) return JSON.parse(raw);
+            } catch(e) {}
+            return {
+                xpTotal:0, xpBalance:0, themeIdx:0,
+                tasks:[], todos:[], planData:{},
+                mebData:{}, denemeler:[], hizHistory:[],
+                hizSorular: Array(40).fill('bos'),
+                achievements:{}, visitedPages:[],
+                achievementOpenCount:0,
+                marketStats:{ drinkCount:0, totalSpent:0 },
+                loginStreak:{ lastDate:'', streak:0 },
+                bossCompleted:0,
+                focusMinutes:0,
+                completedTaskCount:0,
+                streakDays:[],
+            };
+        }
+
+        function saveData(d) { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
+
+        let appData = loadData();
+
+        /* Eksik alanları güvenli başlat */
+        if (!appData.achievements)    appData.achievements = {};
+        if (!appData.visitedPages)    appData.visitedPages = [];
+        if (!appData.marketStats)     appData.marketStats  = { drinkCount:0, totalSpent:0 };
+        if (!appData.loginStreak)     appData.loginStreak  = { lastDate:'', streak:0 };
+        if (!appData.bossCompleted)   appData.bossCompleted = 0;
+        if (!appData.focusMinutes)    appData.focusMinutes  = 0;
+        if (!appData.completedTaskCount) appData.completedTaskCount = 0;
+        if (!appData.streakDays)      appData.streakDays = [];
+        if (!appData.planData)        appData.planData = {};
+        if (!appData.tasks)           appData.tasks = [];
+        if (!appData.todos)           appData.todos = [];
+
+        /* ── ACHIEVEMENT ENGINE (inline) ──────────────────── */
+        const ACH_XP = {'crafting-table':10,'stone-age':20,'iron-armor':30,'diamond-ore':50,'enchanting':75,'dragon-breath':100,'speedrunner':40,'invis-potion':60,'firin-ustasi':15,'potion-master':35,'trade-center':50,'haritaci':25,'redstone-eng':30,'beacon-light':80,'villager-friend':25,'world-traveler':20,'monster-hunter':20,'wither-slayer':60,'hardcore-mode':90,'lgs-slayer':200,'redstone-math':40,'enchant-translator':45,'brewing-science':25,'ancient-history':80,'wandering-english':20,'totem-religion':40,'speed-potion-2':15,'mending-book':35,'phantom-hunter':50,'sunrise-clock':20,'mining-fatigue':70,'respawn-anchor':45,'emerald-block':90,'item-frame':20,'dye-crafter':25,'unbreaking-3':100,'the-void':30,'netherite-upgrade':60,'warden-slayer':85,'elytra-flight':50,'campfire-rest':25,'clock-sync':40,'spyglass-focus':45,'glowstone-night':55,'slimeball-stuck':10,'observer-stats':20,'golden-apple':40,'enchanted-apple':100,'shield-defense':35,'anvil-repair':40,'compass-nav':25,'shulker-box':20,'note-block':15,'command-block':15,'jukebox-party':30,'bookshelf-meb':90,'ender-pearl':70,'chorus-fruit':35,'trident-loyalty':120,'nether-star':150};
+        const ACH_DEPS = {'crafting-table':null,'stone-age':'crafting-table','iron-armor':'stone-age','diamond-ore':'iron-armor','enchanting':'diamond-ore','dragon-breath':'enchanting','speedrunner':'iron-armor','invis-potion':'speedrunner','firin-ustasi':'crafting-table','potion-master':'firin-ustasi','trade-center':'potion-master','haritaci':'crafting-table','redstone-eng':'haritaci','beacon-light':'redstone-eng','villager-friend':'beacon-light','world-traveler':'villager-friend','monster-hunter':'crafting-table','wither-slayer':'monster-hunter','hardcore-mode':'wither-slayer','lgs-slayer':'dragon-breath','redstone-math':'stone-age','enchant-translator':'stone-age','brewing-science':'potion-master','ancient-history':'dragon-breath','wandering-english':'haritaci','totem-religion':'dragon-breath','speed-potion-2':'speedrunner','mending-book':'speedrunner','phantom-hunter':'invis-potion','sunrise-clock':'villager-friend','mining-fatigue':'invis-potion','respawn-anchor':'diamond-ore','emerald-block':'trade-center','item-frame':'firin-ustasi','dye-crafter':'haritaci','unbreaking-3':'villager-friend','the-void':'redstone-eng','netherite-upgrade':'diamond-ore','warden-slayer':'dragon-breath','elytra-flight':'speedrunner','campfire-rest':'invis-potion','clock-sync':'villager-friend','spyglass-focus':'mining-fatigue','glowstone-night':'phantom-hunter','slimeball-stuck':'crafting-table','observer-stats':'slimeball-stuck','golden-apple':'respawn-anchor','enchanted-apple':'golden-apple','shield-defense':'enchanted-apple','anvil-repair':'shield-defense','compass-nav':'redstone-eng','shulker-box':'compass-nav','note-block':'campfire-rest','command-block':'dye-crafter','jukebox-party':'redstone-eng','bookshelf-meb':'dragon-breath','ender-pearl':'speedrunner','chorus-fruit':'brewing-science','trident-loyalty':'unbreaking-3','nether-star':'trident-loyalty'};
+        const ACH_NAMES = {'crafting-table':['🪵','Odun Çağı','Sisteme ilk içeriğini girdin!'],'stone-age':['⛏️','Taş Devri','10 görev tamamladın!'],'iron-armor':['🛡️','Demir Zırh','Bir denemede 50 neti geçtin!'],'diamond-ore':['💎','ELMAS!!!','Bir denemede 80 net üstü!'],'enchanting':['📖','Büyü Masası','Toplam 1000 soru çözdün!'],'dragon-breath':['🐲','Ejderha Nefesi','Tüm MEB konularını tamamladın!'],'speedrunner':['⚡','Speedrunner','20 soruyu 10 dakikada bitirdin!'],'invis-potion':['🌫️','Görünmezlik İksiri','120 dakika kesintisiz odak!'],'firin-ustasi':['🍞','Fırıncı','Marketten ilk yiyecek aldın!'],'potion-master':['🧪','İksir Ustası','10 kez Kahve/İçecek aldın!'],'trade-center':['💰','Ticaret Merkezi','Toplam 2000 XP harcadın!'],'haritaci':['🗺️','Haritacı','Tüm sayfaları keşfettin!'],'redstone-eng':['⚙️','Kızıltaş Mühendisi','Haftalık planını eksiksiz doldurdun!'],'beacon-light':['🗼','Fener (Beacon)','10. Seviyeye ulaştın!'],'villager-friend':['🧑‍🌾','Köylü Dostu','5 gün üst üste giriş yaptın!'],'world-traveler':['🌍','Dünya Gezgini','Başarımlar sayfasını 50 kez açtın!'],'monster-hunter':['⚔️','Canavar Avcısı','İlk Boss görevini tamamladın!'],'wither-slayer':['💀','Wither Avcısı','10 Boss görevi tamamladın!'],'hardcore-mode':['💔','Hardcore Mod','Bir hafta sıfır sektirme!'],'lgs-slayer':['👑','LGS Slayer','TÜM başarımları açtın!'],'redstone-math':['📐','Kızıltaş Hesap Makinesi','Mat testlerinde 100 doğruya ulaştın!'],'enchant-translator':['📖','Büyü Masası Çevirmeni','Türkçede 3 testi hatasız bitirdin!'],'brewing-science':['🧪','İksir Tezgahı','Fen sorularından 50 tane çözdün!'],'ancient-history':['📜','Antik Kalıntı','Sosyal/İnkılap konularını tamamladın!'],'wandering-english':['🌍','Gezgin Tüccar','İngilizce testlerinde 500 XP topladın!'],'totem-religion':['🌙','Ölümsüzlük Totemi','Din testlerinde 5 ardışık %100!'],'speed-potion-2':['☄️','Hız İksiri II','Hızda 15 sn altında soru çözdün!'],'mending-book':['🛠️','Tamir Büyüsü','20 yanlışı doğruya çevirdin!'],'phantom-hunter':['🦇','Fantom Avcısı','Gece 22:00 sonrası 1 saat odak!'],'sunrise-clock':['🌅','Gündoğumu','07:00 öncesi giriş yapıp görev bitirdin!'],'mining-fatigue':['⛏️','Madenci Yorgunluğu','Tek oturumda 3 saat çalıştın!'],'respawn-anchor':['⚓','Yeniden Doğma Çapası','Denemede 20 net artışı yakaladın!'],'emerald-block':['🟩','Zümrüt Bloğu','Cüzdanda 5000 XP biriktirdin!'],'item-frame':['🖼️','Koleksiyoncu','5 farklı kategoride market alışı!'],'dye-crafter':['🎨','Boya Ustası','Tüm temaları kullandın!'],'unbreaking-3':['🛡️','Kırılmazlık III','30 gün kesintisiz ziyaret!'],'the-void':['🌌','Hiçlik (The Void)','Plansız ekstra konu çalıştın!'],'netherite-upgrade':['🪨','Netherit Yükseltmesi','3 denemede üst üste 80 net!'],'warden-slayer':['👹','Warden Avcısı','Tüm zor MEB konularını bitirdin!'],'elytra-flight':['🪽','Elytra','Hızda 50 soruyu sıfır hatayla geçtin!'],'campfire-rest':['🔥','Kamp Ateşi','4 pomodoro + 1 uzun mola döngüsü!'],'clock-sync':['⏰','Saat','3 gün üst üste zamanında başladın!'],'spyglass-focus':['🔭','Dürbün','Tek derste 150 soru çözdün!'],'glowstone-night':['💡','Işıktaşı','Gece yarısı 50 netli deneme bitirdin!'],'slimeball-stuck':['🟩','Balçık Topu','İlk soruyu sorulacaklara ekledin!'],'observer-stats':['👁️','Gözlemci','10 dk hata analizi yaptın!'],'golden-apple':['🍎','Altın Elma','3 yanlış sonrası 5 ardışık doğru!'],'enchanted-apple':['🌟','Büyülü Altın Elma','Tek günde 500 soru barajı!'],'shield-defense':['🛡️','Kalkan','Zayıf derste yanlışları yarıya indirdin!'],'anvil-repair':['🗜️','Örs','Zor seviye 5 test tamamladın!'],'compass-nav':['🧭','Pusula','Haftalık programı eksiksiz oluşturdun!'],'shulker-box':['🧰','Shulker Kutusu','50 soru kaydettin!'],'note-block':['🎵','Nota Bloğu','Odak müziğini 10 kez aktifleştirdin!'],'command-block':['⚙️','Komut Bloğu','Ayarlarda 3 değişiklik yaptın!'],'jukebox-party':['📻','Müzik Kutusu',"Haftalık hedeflerin %100'ünü tamamladın!"],'bookshelf-meb':['📚','Kitaplık','MEB sorularının yarısını bitirdin!'],'ender-pearl':['🔮','Ender İncisi','10 soruyu 5 dk\'da çözdün!'],'chorus-fruit':['🌺','Koro Meyvesi','Konfor alanından çıkıp 2 ekstra test!'],'trident-loyalty':['🔱','Sadakat Mızrağı','60 gün kesintisiz giriş!'],'nether-star':['⭐','Nether Yıldızı','Türkiye Geneli denemesini sisteme girdin!']};
+
+        function checkAndUnlock(id) {
+            if (appData.achievements[id]) return false;
+            const dep = ACH_DEPS[id];
+            if (dep && !appData.achievements[dep]) return false;
+            appData.achievements[id] = true;
+            const xp = ACH_XP[id] || 0;
+            if (xp > 0) { appData.xpTotal += xp; appData.xpBalance += xp; }
+            saveData(appData);
+            updateHeader();
+            _showAchToast(id, xp);
+            /* LGS Slayer kontrolü */
+            if (id !== 'lgs-slayer') {
+                const allIds = Object.keys(ACH_DEPS).filter(k => k !== 'lgs-slayer');
+                if (allIds.every(k => appData.achievements[k])) {
+                    setTimeout(() => checkAndUnlock('lgs-slayer'), 1200);
+                }
+            }
+            return true;
+        }
+
+        function _showAchToast(id, xp) {
+            const info = ACH_NAMES[id]; if (!info) return;
+            let c = document.getElementById('_ach-toast-container');
+            if (!c) {
+                c = document.createElement('div'); c.id = '_ach-toast-container';
+                c.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;gap:10px;align-items:center;pointer-events:none;';
+                document.body.appendChild(c);
+            }
+            const t = document.createElement('div');
+            t.style.cssText = 'background:#000;border:2px solid #ffaa00;border-radius:14px;padding:14px 22px;display:flex;align-items:center;gap:14px;box-shadow:0 0 28px rgba(255,170,0,0.5);opacity:0;transform:translateY(24px) scale(0.95);transition:opacity 0.35s ease,transform 0.35s cubic-bezier(0.34,1.56,0.64,1);max-width:420px;min-width:280px;';
+            t.innerHTML = `<div style="font-size:32px">${info[0]}</div><div><div style="font-size:9px;color:#ffaa00;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">🏆 BAŞARIM AÇILDI!</div><div style="font-size:14px;font-weight:bold;color:#fff;margin-bottom:2px;">${info[1]}</div><div style="font-size:11px;color:#666;">${info[2]}</div></div>${xp>0?`<div style="font-size:13px;font-weight:bold;color:#ffaa00;white-space:nowrap;margin-left:auto;">+${xp} XP</div>`:''}`;
+            c.appendChild(t);
+            requestAnimationFrame(() => requestAnimationFrame(() => { t.style.opacity='1'; t.style.transform='translateY(0) scale(1)'; }));
+            setTimeout(() => { t.style.opacity='0'; t.style.transform='translateY(-12px) scale(0.96)'; setTimeout(() => t.remove(), 400); }, 3500);
+        }
+
+        /* ── SAYFA ZİYARET KAYDI ──────────────────────────── */
+        const ALL_PAGES = ['index','meb','deneme','hiz','achievements'];
+        function registerPage(pageName) {
+            if (!appData.visitedPages.includes(pageName)) {
+                appData.visitedPages.push(pageName);
+                saveData(appData);
+            }
+            if (ALL_PAGES.every(p => appData.visitedPages.includes(p))) {
+                checkAndUnlock('haritaci');
+            }
+        }
+
+        /* ── TEMALAR ──────────────────────────────────────── */
+        const themes = ['','theme-cyan','theme-purple','theme-green'];
+        function applyTheme() { document.body.className = themes[appData.themeIdx] || ''; }
+        function cycleTheme() {
+            appData.themeIdx=(appData.themeIdx+1)%themes.length;
+            /* dye-crafter: kullanılan temaları takip et */
+            if (!appData.marketStats.usedThemes) appData.marketStats.usedThemes = {};
+            appData.marketStats.usedThemes[appData.themeIdx] = true;
+            /* 4 tema indeksi (0,1,2,3) hepsi kullanıldıysa */
+            if (Object.keys(appData.marketStats.usedThemes).length >= 4) checkAndUnlock('dye-crafter');
+            saveData(appData); applyTheme();
+        }
+
+        /* ── HEADER ───────────────────────────────────────── */
+        function updateHeader() {
+            const level = Math.floor(appData.xpTotal/100)+1;
+            document.getElementById('level').innerText      = level;
+            document.getElementById('xp-balance').innerText = appData.xpBalance;
+            document.getElementById('header-xp-bar').style.width = (appData.xpTotal%100)+'%';
+            const ranks = ['ÇAYLAK','DENEYİMLİ','USTA','FENLİSELİ','EFSANE'];
+            document.getElementById('rank-name').innerText = ranks[Math.min(level-1,4)];
+        }
+
+        /* ── HAFTALIK PLAN ────────────────────────────────── */
+        function initPlan() {
+            const tbody = document.getElementById('plan-body');
+            tbody.innerHTML = '';
+            ['PZT','SAL','ÇAR','PER','CUM','CMT','PAZ'].forEach((day,r) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td style="color:var(--primary);font-weight:bold;">${day}</td><td contenteditable="true" oninput="savePlan()"></td><td contenteditable="true" oninput="savePlan()">MOLA</td><td contenteditable="true" oninput="savePlan()"></td><td contenteditable="true" oninput="savePlan()">MOLA</td>`;
+                tbody.appendChild(tr);
+                tr.querySelectorAll('td[contenteditable="true"]').forEach((c,ci) => {
+                    if (appData.planData[`${r}-${ci}`]) c.innerText = appData.planData[`${r}-${ci}`];
+                });
+            });
+        }
+
+        function savePlan() {
+            document.querySelectorAll('#plan-body tr').forEach((row,r) => {
+                row.querySelectorAll('td[contenteditable="true"]').forEach((cell,c) => {
+                    appData.planData[`${r}-${c}`] = cell.innerText;
+                });
+            });
+            saveData(appData);
+            checkPlanAchievements();
+        }
+
+        function checkPlanAchievements() {
+            /* crafting-table: plana en az 1 anlamlı içerik girildi */
+            const hasPlan = Object.keys(appData.planData).some(k =>
+                appData.planData[k] && appData.planData[k].trim() !== '' && appData.planData[k] !== 'MOLA'
+            );
+            if (hasPlan) checkAndUnlock('crafting-table');
+
+            /* redstone-eng: 7 gün × 2 ders hücresi dolu (14 hücre, sütun 0 ve 2) */
+            let doluHucre = 0;
+            for (let r = 0; r < 7; r++) {
+                if (appData.planData[`${r}-0`] && appData.planData[`${r}-0`].trim() !== '') doluHucre++;
+                if (appData.planData[`${r}-2`] && appData.planData[`${r}-2`].trim() !== '') doluHucre++;
+            }
+            if (doluHucre >= 14) checkAndUnlock('redstone-eng');
+        }
+
+        /* ── UI GÜNCELLEYİCİ ──────────────────────────────── */
+        function updateUI() {
+            updateHeader();
+            const tList = document.getElementById('taskList');
+            tList.innerHTML = '';
+            appData.tasks.forEach((t,i) => {
+                const bc = t.isBoss ? 'var(--danger)' : 'var(--primary)';
+                tList.innerHTML += `<div style="display:flex;justify-content:space-between;align-items:center;background:#000;padding:8px;border-radius:8px;border-left:4px solid ${bc};margin-bottom:6px;box-shadow:0 0 5px ${t.isBoss?'var(--danger)':'var(--primary-glow)'};"><span style="${t.isBoss?'color:var(--danger);font-weight:bold':''}">${t.isBoss?'👹 ':''}${t.text}</span><button onclick="completeTask(${i})">BİTİR</button></div>`;
+            });
+            const dList = document.getElementById('todoList');
+            dList.innerHTML = '';
+            appData.todos.forEach((todo,i) => {
+                dList.innerHTML += `<div style="margin-bottom:6px;font-size:12px;"><input type="checkbox" ${todo.done?'checked':''} onclick="toggleTodo(${i})"><span style="${todo.done?'text-decoration:line-through;color:#444':''}"> • ${todo.text}</span></div>`;
+            });
+            saveData(appData);
+            updateLGSBar();
+        }
+
+        function addTask(isBoss) {
+            const v = document.getElementById('taskInput').value.trim();
+            if (!v) return;
+            appData.tasks.push({ text:v, isBoss });
+            document.getElementById('taskInput').value = '';
+            /* crafting-table: İlk görev ekleme */
+            checkAndUnlock('crafting-table');
+            updateUI();
+        }
+
+        function completeTask(i) {
+            const isBoss = appData.tasks[i].isBoss;
+            const gain   = isBoss ? 50 : 20;
+            appData.xpTotal   += gain;
+            appData.xpBalance += gain;
+            appData.tasks.splice(i, 1);
+            appData.completedTaskCount = (appData.completedTaskCount||0) + 1;
+
+            /* stone-age: 10 görev */
+            if (appData.completedTaskCount >= 10) checkAndUnlock('stone-age');
+
+            /* Boss başarımları */
+            if (isBoss) {
+                appData.bossCompleted = (appData.bossCompleted||0) + 1;
+                if (appData.bossCompleted >= 1)  checkAndUnlock('monster-hunter');
+                if (appData.bossCompleted >= 10) checkAndUnlock('wither-slayer');
+            }
+
+            /* beacon-light: Level 10 */
+            const level = Math.floor(appData.xpTotal/100)+1;
+            if (level >= 10) checkAndUnlock('beacon-light');
+
+            /* sunrise-clock: sabah 07:00 öncesi giriş + ilk görev */
+            checkSunriseClock();
+
+            /* emerald-block: bakiyede 5000 XP */
+            if (appData.xpBalance >= 5000) checkAndUnlock('emerald-block');
+
+            saveData(appData);
+            updateUI();
+        }
+
+        function toggleTodo(i) { appData.todos[i].done=!appData.todos[i].done; updateUI(); }
+        function addTodo() {
+            const v = document.getElementById('todoInput').value.trim();
+            if (!v) return;
+            appData.todos.push({ text:v, done:false });
+            document.getElementById('todoInput').value = '';
+            updateUI();
+        }
+
+        /* ── MARKET ───────────────────────────────────────── */
+        function buy(cost, category) {
+            if (appData.xpBalance < cost) { alert('XP Yetersiz!'); return; }
+            appData.xpBalance -= cost;
+            appData.marketStats.totalSpent = (appData.marketStats.totalSpent||0) + cost;
+
+            /* Kategorileri kaydet */
+            if (!appData.marketStats.categories) appData.marketStats.categories = {};
+            appData.marketStats.categories[category] = true;
+
+            if (category === 'food') {
+                checkAndUnlock('firin-ustasi');
+            }
+            if (category === 'drink') {
+                appData.marketStats.drinkCount = (appData.marketStats.drinkCount||0) + 1;
+                checkAndUnlock('firin-ustasi');
+                if (appData.marketStats.drinkCount >= 10) checkAndUnlock('potion-master');
+            }
+            if (category === 'theme') {
+                if (!appData.marketStats.themesUsed) appData.marketStats.themesUsed = new Set();
+                /* theme satın alımı tema değiştirme ile tetiklenir — burada flag koy */
+                appData.marketStats.themesBought = (appData.marketStats.themesBought||0) + 1;
+            }
+            if (appData.marketStats.totalSpent >= 2000) checkAndUnlock('trade-center');
+
+            /* item-frame: 5 farklı kategoride alım */
+            const catCount = Object.keys(appData.marketStats.categories||{}).length;
+            if (catCount >= 5) checkAndUnlock('item-frame');
+
+            /* emerald-block: bakiyede 5000 XP */
+            if (appData.xpBalance >= 5000) checkAndUnlock('emerald-block');
+
+            saveData(appData);
+            updateUI();
+            alert('Eşya Kullanıldı!');
+        }
+
+        function luckRoll() {
+            if (appData.xpBalance < 10) { alert('XP Yetersiz! (10 XP gerekli)'); return; }
+            appData.xpBalance -= 10;
+            appData.marketStats.totalSpent = (appData.marketStats.totalSpent||0) + 10;
+            const win = Math.random() > 0.6 ? 40 : 0;
+            if (win > 0) { appData.xpBalance += win; appData.xpTotal += win; }
+            if (appData.marketStats.totalSpent >= 2000) checkAndUnlock('trade-center');
+            saveData(appData);
+            updateUI();
+            alert(win > 0 ? `🎲 KAZANDIN! +${win} XP` : '🎲 Bu sefer olmadı!');
+        }
+
+        function resetDaily() {
+            if (confirm('TODO LİSTESİ TEMİZLENSİN Mİ?')) { appData.todos=[]; updateUI(); }
+        }
+
+        /* ── ODAK ZAMANLAYICI ─────────────────────────────── */
+        let timer, timeLeft=25*60;
+
+        function setTimer() { stopTimer(); timeLeft=document.getElementById('timer-min').value*60; updateTimerUI(); }
+
+        function startTimer() {
+            clearInterval(timer);
+            const startMin  = Math.floor(timeLeft/60);
+            const startHour = new Date().getHours();
+            timer = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    appData.xpTotal   += 50;
+                    appData.xpBalance += 50;
+                    appData.focusMinutes = (appData.focusMinutes||0) + startMin;
+                    /* invis-potion: 120 dk kesintisiz odak */
+                    if (startMin >= 120) checkAndUnlock('invis-potion');
+                    /* mining-fatigue: tek oturumda 180 dk (3 saat) */
+                    if (startMin >= 180) checkAndUnlock('mining-fatigue');
+                    /* phantom-hunter: gece 22:00-05:00 arası başlatılmış ve 60 dk tamamlandı */
+                    if ((startHour >= 22 || startHour < 5) && startMin >= 60) checkAndUnlock('phantom-hunter');
+                    /* campfire-rest: pomodoro döngüsü sayacı (25 dk = 1 pomodoro) */
+                    if (startMin >= 25) {
+                        appData.pomodoroCount = (appData.pomodoroCount||0) + 1;
+                        if (appData.pomodoroCount >= 4) { checkAndUnlock('campfire-rest'); appData.pomodoroCount = 0; }
+                    }
+                    saveData(appData);
+                    updateUI();
+                    alert('ODAK BİTTİ! +50 XP');
+                } else { timeLeft--; updateTimerUI(); }
+            }, 1000);
+        }
+
+        function stopTimer() { clearInterval(timer); }
+        function updateTimerUI() {
+            const m=Math.floor(timeLeft/60), s=timeLeft%60;
+            document.getElementById('timer-display').innerText=`${m}:${s<10?'0'+s:s}`;
+        }
+
+        /* ── LGS BARI ─────────────────────────────────────── */
+        function updateLGSBar() {
+            const lgsDate = new Date('June 14, 2026 09:30:00').getTime();
+            const days    = Math.floor((lgsDate - Date.now())/(1000*60*60*24));
+            document.getElementById('lgs-days').innerText = days;
+            const bar = document.getElementById('lgs-bar-fill');
+            bar.style.width = Math.min(100,(days/400)*100)+'%';
+            bar.style.backgroundColor = days<100 ? 'var(--danger)' : 'var(--primary)';
+        }
+
+        /* ── KILLER MODE ──────────────────────────────────── */
+        function killerMode() {
+            if (confirm('⚠️ KILLER MODE ⚠️\n\nTÜM VERİLER SİLİNECEK!\n\nEmin misin?')) {
+                if (confirm('SON UYARI!\n\nGeri dönüş yok, devam et?')) {
+                    localStorage.removeItem(STORAGE_KEY);
+                    appData = loadData();
+                    initPlan(); updateUI();
+                    alert('💀 KILLER MODE AKTIF!\n\nTüm veriler sıfırlandı.');
+                }
+            }
+        }
+
+        /* ── GİRİŞ STREAK ─────────────────────────────────── */
+        function checkLoginStreak() {
+            const today = new Date().toDateString();
+            const hour  = new Date().getHours();
+            const ls    = appData.loginStreak;
+            if (ls.lastDate === today) {
+                /* Bugün zaten sayıldı ama sunrise-clock henüz kontrol edilmemiş olabilir */
+                if (hour < 7 && !appData.loginStreak.sunriseDone) {
+                    appData.loginStreak.sunriseDone = true;
+                    /* sunrise-clock: 07:00 öncesi giriş — görev tamamlanınca tetiklenir (flag set) */
+                    appData.loginStreak.sunriseToday = true;
+                    saveData(appData);
+                }
+                return;
+            }
+            const yesterday = new Date(Date.now()-86400000).toDateString();
+            ls.streak = ls.lastDate === yesterday ? (ls.streak||0)+1 : 1;
+            ls.lastDate = today;
+            ls.sunriseDone = false;
+            ls.sunriseToday = hour < 7;
+            saveData(appData);
+            /* villager-friend: 5 gün üst üste */
+            if (ls.streak >= 5)  checkAndUnlock('villager-friend');
+            /* unbreaking-3: 30 gün kesintisiz */
+            if (ls.streak >= 30) checkAndUnlock('unbreaking-3');
+            /* trident-loyalty: 60 gün kesintisiz */
+            if (ls.streak >= 60) checkAndUnlock('trident-loyalty');
+        }
+
+        /* ── SUNRISE CLOCK: görev tamamlanınca kontrol ──────── */
+        function checkSunriseClock() {
+            if (appData.loginStreak && appData.loginStreak.sunriseToday) {
+                checkAndUnlock('sunrise-clock');
+                appData.loginStreak.sunriseToday = false;
+                saveData(appData);
+            }
+        }
+
+        /* ── THE VOID: ekstra konu ekleme ───────────────────── */
+        function markExtraStudy() {
+            appData.extraStudy = true;
+            saveData(appData);
+            checkAndUnlock('the-void');
+        }
+
+        /* ── BAŞLANGIÇ ────────────────────────────────────── */
+        applyTheme();
+        initPlan();
+        updateUI();
+        updateTimerUI();
+        registerPage('index');
+        checkLoginStreak();
+    </script>
+</body>
+</html>

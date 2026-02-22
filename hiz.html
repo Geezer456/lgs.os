@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hız Modu · LGS.OS</title>
+    <style>
+        :root { --primary:#ff8800; --primary-glow:rgba(255,136,0,0.6); --bg:#050505; --card:#111; --text:#ddd; --accent:#00ff88; --header-bg:#000; --danger:#ff3333; --mc-green:#55ff55; --mc-green-glow:rgba(85,255,85,0.8); --mc-purple:#aa00ff; --mc-gold:#ffaa00; }
+        body.theme-cyan   { --primary:#00f2ff; --primary-glow:rgba(0,242,255,0.6); }
+        body.theme-purple { --primary:#bc13fe; --primary-glow:rgba(188,19,254,0.6); }
+        body.theme-green  { --primary:#39ff14; --primary-glow:rgba(57,255,20,0.6); }
+        * { box-sizing:border-box; }
+        body { font-family:'Segoe UI',sans-serif; background-color:var(--bg); color:var(--text); margin:0; display:flex; flex-direction:column; min-height:100vh; overflow-y:auto; transition:0.3s; }
+        .top-header { width:100%; height:60px; background-color:var(--header-bg); border-bottom:2px solid #222; display:flex; align-items:center; justify-content:space-between; padding:0 20px; position:sticky; top:0; z-index:1000; }
+        .logo { color:var(--primary); font-weight:bold; font-size:20px; letter-spacing:2px; text-shadow:0 0 10px var(--primary-glow); }
+        .header-stats { display:flex; align-items:center; gap:12px; width:380px; }
+        .lvl-box { font-weight:bold; color:var(--primary); font-size:14px; }
+        .header-xp-container { flex:1; height:10px; background:#222; border-radius:5px; overflow:hidden; border:1px solid #333; }
+        #header-xp-bar { height:100%; background:var(--primary); width:0%; transition:width 0.5s ease; box-shadow:0 0 8px var(--primary); }
+        .rank-tag { font-size:10px; background:var(--primary); color:#000; padding:2px 6px; border-radius:4px; font-weight:bold; white-space:nowrap; }
+        button, .nav-link { padding:6px 10px; font-size:10px; border:1px solid var(--primary); background:transparent; color:var(--primary); cursor:pointer; font-weight:bold; transition:0.3s; border-radius:12px !important; text-decoration:none; display:inline-block; line-height:normal; white-space:nowrap; }
+        button:hover, .nav-link:hover { background:var(--primary); color:#000; box-shadow:0 0 8px var(--primary-glow); }
+        .nav-link.active-page { background:var(--primary); color:#000; box-shadow:0 0 12px var(--primary-glow); }
+        .nav-link.achievements-link { border-color:var(--mc-green); color:var(--mc-green); box-shadow:0 0 10px var(--mc-green-glow); }
+        .nav-link.achievements-link:hover { background:var(--mc-green); color:#000; }
+        input[type="number"],select { background:#000; border:1px solid #333; color:#fff; padding:6px; font-size:11px; border-radius:12px !important; }
+        .page-content { padding:25px 20px; flex:1; }
+        .page-title { font-size:26px; font-weight:bold; color:var(--primary); text-shadow:0 0 15px var(--primary-glow),0 0 30px var(--primary-glow); letter-spacing:3px; margin:0 0 4px 0; text-align:center; }
+        .page-subtitle { color:#555; font-size:11px; margin:0 0 25px 0; text-align:center; letter-spacing:1px; }
+        .analiz-container { background:var(--card); border:2px solid #222; border-radius:12px; padding:24px; margin-bottom:20px; transition:all 0.3s ease; }
+        .analiz-container:hover { border-color:var(--primary); box-shadow:0 0 12px var(--primary-glow); }
+        .hiz-settings { display:flex; justify-content:center; gap:24px; margin-bottom:24px; flex-wrap:wrap; }
+        .hiz-settings>div { display:flex; flex-direction:column; gap:6px; min-width:110px; }
+        .hiz-settings label { font-size:10px; color:var(--primary); font-weight:bold; letter-spacing:1px; text-transform:uppercase; }
+        .hiz-settings select { padding:8px 10px; font-size:12px; width:100%; }
+        .hiz-timer-wrapper { text-align:center; margin:10px 0 20px 0; }
+        @keyframes timerUrgent { 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
+        .hiz-timer { font-size:80px; color:var(--primary); font-family:'Courier New',monospace; text-align:center; text-shadow:0 0 30px var(--primary-glow),0 0 60px var(--primary-glow); line-height:1; letter-spacing:4px; transition:color 0.5s,text-shadow 0.5s; }
+        .hiz-timer.urgent { color:var(--danger); text-shadow:0 0 30px rgba(255,51,51,0.8),0 0 60px rgba(255,51,51,0.4); animation:timerUrgent 0.8s ease-in-out infinite; }
+        .hiz-speed-display { font-size:13px; color:#444; margin-top:10px; font-family:monospace; letter-spacing:1px; transition:color 0.3s; }
+        .hiz-speed-display.active { color:var(--accent); }
+        .hiz-controls { display:flex; justify-content:center; gap:12px; margin-bottom:28px; flex-wrap:wrap; }
+        .speed-btn { padding:10px 22px; font-size:12px; font-weight:bold; border-radius:12px !important; letter-spacing:1px; }
+        .speed-btn.start-btn { border-color:var(--accent); color:var(--accent); }
+        .speed-btn.start-btn:hover { background:var(--accent); color:#000; box-shadow:0 0 14px rgba(0,255,136,0.6); }
+        .speed-btn.finish-btn { border-color:var(--mc-gold); color:var(--mc-gold); }
+        .speed-btn.finish-btn:hover { background:var(--mc-gold); color:#000; box-shadow:0 0 14px rgba(255,170,0,0.6); }
+        .speed-btn.danger-btn { border-color:var(--danger); color:var(--danger); }
+        .speed-btn.danger-btn:hover { background:var(--danger); color:#fff; }
+        .soru-grid-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+        .soru-grid-title { font-size:13px; font-weight:bold; color:var(--primary); }
+        .soru-sayaclar { display:flex; gap:10px; }
+        .sayac-badge { font-size:10px; font-weight:bold; padding:3px 10px; border-radius:20px; border:1px solid; }
+        .sayac-dogru { border-color:var(--accent); color:var(--accent); background:rgba(0,255,136,0.08); }
+        .sayac-yanlis { border-color:var(--danger); color:var(--danger); background:rgba(255,51,51,0.08); }
+        .sayac-bos { border-color:#555; color:#555; background:rgba(85,85,85,0.08); }
+        .soru-grid-hint { font-size:10px; color:#333; margin-bottom:14px; text-align:center; }
+        .soru-grid { display:grid; grid-template-columns:repeat(10,1fr); gap:7px; }
+        .soru-box { background:#000; border:2px solid #222; border-radius:9px; padding:10px 4px; text-align:center; font-size:13px; font-weight:bold; cursor:pointer; transition:all 0.18s; user-select:none; color:#555; }
+        .soru-box:hover { border-color:var(--primary); color:var(--primary); }
+        .soru-box.dogru { border-color:var(--accent); background:rgba(0,255,136,0.08); color:var(--accent); box-shadow:0 0 6px rgba(0,255,136,0.2); }
+        .soru-box.yanlis { border-color:var(--danger); background:rgba(255,51,51,0.08); color:var(--danger); box-shadow:0 0 6px rgba(255,51,51,0.2); }
+        .soru-box.bos { border-color:#333; color:#444; }
+        .sonuc-panel { display:none; background:#000; border:2px solid var(--mc-gold); border-radius:12px; padding:20px; margin-top:20px; text-align:center; box-shadow:0 0 20px rgba(255,170,0,0.3); animation:fadeInUp 0.4s ease; }
+        .sonuc-panel.show { display:block; }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        .sonuc-baslik { font-size:20px; color:var(--mc-gold); font-weight:bold; margin-bottom:16px; text-shadow:0 0 10px rgba(255,170,0,0.6); letter-spacing:2px; }
+        .sonuc-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px; }
+        .sonuc-kart { background:#0a0a0a; border:1px solid #222; border-radius:10px; padding:12px 8px; }
+        .sonuc-kart-label { font-size:9px; color:#555; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+        .sonuc-kart-value { font-size:22px; font-weight:bold; font-family:monospace; }
+        .sk-dogru{color:var(--accent)} .sk-yanlis{color:var(--danger)} .sk-bos{color:#555} .sk-xp{color:var(--mc-gold)}
+        .hiz-history { background:var(--card); border:2px solid #1a1a1a; border-radius:12px; padding:20px; transition:all 0.3s; }
+        .hiz-history:hover { border-color:var(--primary); box-shadow:0 0 10px var(--primary-glow); }
+        .hiz-history-baslik { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+        .hiz-history-title { font-size:14px; font-weight:bold; color:var(--primary); text-shadow:0 0 8px var(--primary-glow); }
+        .kayit-sayac { font-size:10px; color:#444; background:#000; border:1px solid #222; padding:3px 10px; border-radius:20px; }
+        .hiz-history-item { padding:10px 12px; border-bottom:1px solid #1a1a1a; font-size:11px; display:flex; justify-content:space-between; align-items:center; transition:0.2s; border-radius:8px; }
+        .hiz-history-item:hover { background:#0a0a0a; }
+        .hiz-history-item:last-child { border-bottom:none; }
+        .history-sol { display:flex; flex-direction:column; gap:3px; }
+        .history-tarih { color:var(--primary); font-weight:bold; }
+        .history-detay { color:#444; font-size:9px; }
+        .history-sag { text-align:right; }
+        .history-stats { color:#aaa; font-size:11px; }
+        .history-xp { color:var(--accent); font-size:10px; font-weight:bold; margin-top:2px; }
+        .history-speed { font-size:9px; color:var(--mc-gold); background:rgba(255,170,0,0.08); border:1px solid rgba(255,170,0,0.2); padding:2px 7px; border-radius:10px; margin-left:8px; }
+        .status-mini-bar { background:#000; border-top:2px solid #1a1a1a; padding:8px 20px; display:flex; justify-content:space-between; align-items:center; font-size:10px; color:#444; margin-top:auto; }
+        .status-mini-bar span { color:var(--primary); font-weight:bold; }
+        .xp-toast { position:fixed; bottom:30px; right:30px; background:#000; border:2px solid var(--mc-gold); color:var(--mc-gold); padding:12px 22px; border-radius:12px; font-weight:bold; font-size:14px; box-shadow:0 0 20px rgba(255,170,0,0.4); z-index:9999; opacity:0; transform:translateY(20px); transition:opacity 0.3s,transform 0.3s; pointer-events:none; }
+        .xp-toast.show { opacity:1; transform:translateY(0); }
+        @media(max-width:700px) { .soru-grid{grid-template-columns:repeat(5,1fr)} .hiz-timer{font-size:52px} .sonuc-grid{grid-template-columns:repeat(2,1fr)} }
+    </style>
+</head>
+<body id="mainBody">
+    <header class="top-header">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div class="logo">⚡ LGS.OS</div>
+            <a class="nav-link" href="index.html">🏠 ANA SAYFA</a>
+            <button onclick="cycleTheme()">TEMA</button>
+            <a class="nav-link" href="meb.html">📚 MEB KONU</a>
+            <a class="nav-link" href="deneme.html">📊 DENEME</a>
+            <a class="nav-link active-page" href="hiz.html">⚡ HIZ MODU</a>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <a class="nav-link achievements-link" href="achievements.html">🏆 BAŞARIMLAR</a>
+            <div class="header-stats">
+                <span class="rank-tag" id="rank-name">ÇAYLAK</span>
+                <div class="lvl-box">LVL <span id="level">1</span></div>
+                <div class="header-xp-container"><div id="header-xp-bar"></div></div>
+                <div style="font-size:11px;color:var(--primary);font-weight:bold;"><span id="xp-balance">0</span> XP</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-content">
+        <h2 class="page-title">⚡ HIZ MODU</h2>
+        <p class="page-subtitle">Challenge Modu — Süreyi seç, soruları işaretle, XP kazan &nbsp;·&nbsp; Her doğru: <span style="color:var(--primary);">+5 XP</span></p>
+
+        <div class="analiz-container">
+            <div class="hiz-settings">
+                <div><label>Süre (Dk)</label><select id="hiz-dk" onchange="onAyarDegis()"><option value="10">10 dk</option><option value="20">20 dk</option><option value="30">30 dk</option><option value="40" selected>40 dk</option><option value="60">60 dk</option></select></div>
+                <div><label>Soru Sayısı</label><select id="hiz-soru" onchange="onAyarDegis()"><option value="10">10 soru</option><option value="20">20 soru</option><option value="30">30 soru</option><option value="40" selected>40 soru</option><option value="50">50 soru</option></select></div>
+                <div><label>Ders</label><select id="hiz-ders"><option>TÜRKÇE</option><option>MATEMATİK</option><option>FEN</option><option>İNGİLİZCE</option><option>GENEL</option></select></div>
+            </div>
+            <div class="hiz-timer-wrapper">
+                <div class="hiz-timer" id="hiz-timer">40:00</div>
+                <div class="hiz-speed-display" id="hiz-speed-display">— soru/dk</div>
+            </div>
+            <div class="hiz-controls">
+                <button class="speed-btn start-btn" onclick="startHizMod()">▶ BAŞLA</button>
+                <button class="speed-btn" onclick="pauseHizMod()">⏸ DURDUR</button>
+                <button class="speed-btn" onclick="resetHizMod()">↺ SIFIRLA</button>
+                <button class="speed-btn finish-btn" onclick="finishHizMod()">🏁 BİTİR</button>
+            </div>
+            <div class="soru-grid-header">
+                <span class="soru-grid-title">SORU TAKİP &nbsp;<span id="soru-count" style="color:#555;">40</span></span>
+                <div class="soru-sayaclar">
+                    <span class="sayac-badge sayac-dogru">✅ <span id="sayac-dogru">0</span></span>
+                    <span class="sayac-badge sayac-yanlis">❌ <span id="sayac-yanlis">0</span></span>
+                    <span class="sayac-badge sayac-bos">⭕ <span id="sayac-bos">40</span></span>
+                </div>
+            </div>
+            <div class="soru-grid-hint">Tıkla: Boş → Doğru → Yanlış → Boş</div>
+            <div class="soru-grid" id="soru-grid"></div>
+            <div class="sonuc-panel" id="sonuc-panel">
+                <div class="sonuc-baslik">🏁 OTURUM TAMAMLANDI</div>
+                <div class="sonuc-grid">
+                    <div class="sonuc-kart"><div class="sonuc-kart-label">Doğru</div><div class="sonuc-kart-value sk-dogru" id="sonuc-dogru">0</div></div>
+                    <div class="sonuc-kart"><div class="sonuc-kart-label">Yanlış</div><div class="sonuc-kart-value sk-yanlis" id="sonuc-yanlis">0</div></div>
+                    <div class="sonuc-kart"><div class="sonuc-kart-label">Boş</div><div class="sonuc-kart-value sk-bos" id="sonuc-bos">0</div></div>
+                    <div class="sonuc-kart"><div class="sonuc-kart-label">Kazanılan XP</div><div class="sonuc-kart-value sk-xp" id="sonuc-xp">0</div></div>
+                </div>
+                <div style="font-size:12px;color:#555;" id="sonuc-speed-text"></div>
+            </div>
+        </div>
+
+        <div class="hiz-history">
+            <div class="hiz-history-baslik">
+                <span class="hiz-history-title">📜 HIZ MODU TARİHÇESİ</span>
+                <span class="kayit-sayac" id="kayit-sayac">0 kayıt</span>
+            </div>
+            <div id="hiz-history-list"></div>
+        </div>
+    </div>
+
+    <div class="status-mini-bar">
+        <div>LGS.OS &nbsp;·&nbsp; HIZ MODU MODÜLÜ</div>
+        <div>LGS: <span id="lgs-days-mini">---</span> GÜN KALDI</div>
+    </div>
+    <div class="xp-toast" id="xp-toast">⚡ XP KAZANILDI!</div>
+
+    <script>
+        /* ── VERİ ─────────────────────────────────────────── */
+        const STORAGE_KEY = 'LGS_GAMER_OS_DATA';
+        function loadData() {
+            try { const r=localStorage.getItem(STORAGE_KEY); if(r) return JSON.parse(r); } catch(e) {}
+            return { xpTotal:0,xpBalance:0,themeIdx:0,tasks:[],todos:[],planData:{},mebData:{},denemeler:[],hizHistory:[],hizSorular:Array(40).fill('bos'),achievements:{},visitedPages:[],achievementOpenCount:0,marketStats:{drinkCount:0,totalSpent:0},bossCompleted:0,focusMinutes:0,completedTaskCount:0 };
+        }
+        function saveData(d) { localStorage.setItem(STORAGE_KEY,JSON.stringify(d)); }
+        let appData = loadData();
+        if (!appData.achievements) appData.achievements = {};
+        if (!appData.visitedPages) appData.visitedPages = [];
+        if (!appData.hizHistory)   appData.hizHistory = [];
+        if (!appData.hizSorular)   appData.hizSorular = Array(40).fill('bos');
+
+        /* ── ACHIEVEMENT ENGINE ───────────────────────────── */
+        const ACH_XP = {'crafting-table':10,'stone-age':20,'iron-armor':30,'diamond-ore':50,'enchanting':75,'dragon-breath':100,'speedrunner':40,'invis-potion':60,'firin-ustasi':15,'potion-master':35,'trade-center':50,'haritaci':25,'redstone-eng':30,'beacon-light':80,'villager-friend':25,'world-traveler':20,'monster-hunter':20,'wither-slayer':60,'hardcore-mode':90,'lgs-slayer':200,'redstone-math':40,'enchant-translator':45,'brewing-science':25,'ancient-history':80,'wandering-english':20,'totem-religion':40,'speed-potion-2':15,'mending-book':35,'phantom-hunter':50,'sunrise-clock':20,'mining-fatigue':70,'respawn-anchor':45,'emerald-block':90,'item-frame':20,'dye-crafter':25,'unbreaking-3':100,'the-void':30,'netherite-upgrade':60,'warden-slayer':85,'elytra-flight':50,'campfire-rest':25,'clock-sync':40,'spyglass-focus':45,'glowstone-night':55,'slimeball-stuck':10,'observer-stats':20,'golden-apple':40,'enchanted-apple':100,'shield-defense':35,'anvil-repair':40,'compass-nav':25,'shulker-box':20,'note-block':15,'command-block':15,'jukebox-party':30,'bookshelf-meb':90,'ender-pearl':70,'chorus-fruit':35,'trident-loyalty':120,'nether-star':150};
+        const ACH_DEPS = {'crafting-table':null,'stone-age':'crafting-table','iron-armor':'stone-age','diamond-ore':'iron-armor','enchanting':'diamond-ore','dragon-breath':'enchanting','speedrunner':'iron-armor','invis-potion':'speedrunner','firin-ustasi':'crafting-table','potion-master':'firin-ustasi','trade-center':'potion-master','haritaci':'crafting-table','redstone-eng':'haritaci','beacon-light':'redstone-eng','villager-friend':'beacon-light','world-traveler':'villager-friend','monster-hunter':'crafting-table','wither-slayer':'monster-hunter','hardcore-mode':'wither-slayer','lgs-slayer':'dragon-breath','redstone-math':'stone-age','enchant-translator':'stone-age','brewing-science':'potion-master','ancient-history':'dragon-breath','wandering-english':'haritaci','totem-religion':'dragon-breath','speed-potion-2':'speedrunner','mending-book':'speedrunner','phantom-hunter':'invis-potion','sunrise-clock':'villager-friend','mining-fatigue':'invis-potion','respawn-anchor':'diamond-ore','emerald-block':'trade-center','item-frame':'firin-ustasi','dye-crafter':'haritaci','unbreaking-3':'villager-friend','the-void':'redstone-eng','netherite-upgrade':'diamond-ore','warden-slayer':'dragon-breath','elytra-flight':'speedrunner','campfire-rest':'invis-potion','clock-sync':'villager-friend','spyglass-focus':'mining-fatigue','glowstone-night':'phantom-hunter','slimeball-stuck':'crafting-table','observer-stats':'slimeball-stuck','golden-apple':'respawn-anchor','enchanted-apple':'golden-apple','shield-defense':'enchanted-apple','anvil-repair':'shield-defense','compass-nav':'redstone-eng','shulker-box':'compass-nav','note-block':'campfire-rest','command-block':'dye-crafter','jukebox-party':'redstone-eng','bookshelf-meb':'dragon-breath','ender-pearl':'speedrunner','chorus-fruit':'brewing-science','trident-loyalty':'unbreaking-3','nether-star':'trident-loyalty'};
+        const ACH_NAMES = {'crafting-table':['🪵','Odun Çağı','Sisteme ilk içeriğini girdin!'],'stone-age':['⛏️','Taş Devri','10 görev tamamladın!'],'iron-armor':['🛡️','Demir Zırh','Bir denemede 50 neti geçtin!'],'diamond-ore':['💎','ELMAS!!!','Bir denemede 80 net üstü!'],'enchanting':['📖','Büyü Masası','Toplam 1000 soru çözdün!'],'dragon-breath':['🐲','Ejderha Nefesi','Tüm MEB konularını tamamladın!'],'speedrunner':['⚡','Speedrunner','20 soruyu 10 dakikada bitirdin!'],'invis-potion':['🌫️','Görünmezlik İksiri','120 dakika kesintisiz odak!'],'firin-ustasi':['🍞','Fırıncı','Marketten ilk yiyecek aldın!'],'potion-master':['🧪','İksir Ustası','10 kez Kahve/İçecek aldın!'],'trade-center':['💰','Ticaret Merkezi','Toplam 2000 XP harcadın!'],'haritaci':['🗺️','Haritacı','Tüm sayfaları keşfettin!'],'redstone-eng':['⚙️','Kızıltaş Mühendisi','Haftalık planını eksiksiz doldurdun!'],'beacon-light':['🗼','Fener (Beacon)','10. Seviyeye ulaştın!'],'villager-friend':['🧑‍🌾','Köylü Dostu','5 gün üst üste giriş yaptın!'],'world-traveler':['🌍','Dünya Gezgini','Başarımlar sayfasını 50 kez açtın!'],'monster-hunter':['⚔️','Canavar Avcısı','İlk Boss görevini tamamladın!'],'wither-slayer':['💀','Wither Avcısı','10 Boss görevi tamamladın!'],'hardcore-mode':['💔','Hardcore Mod','Bir hafta sıfır sektirme!'],'lgs-slayer':['👑','LGS Slayer','TÜM başarımları açtın!'],'redstone-math':['📐','Kızıltaş Hesap Makinesi','Mat testlerinde 100 doğruya ulaştın!'],'enchant-translator':['📖','Büyü Masası Çevirmeni','Türkçede 3 testi hatasız bitirdin!'],'brewing-science':['🧪','İksir Tezgahı','Fen sorularından 50 tane çözdün!'],'ancient-history':['📜','Antik Kalıntı','Sosyal/İnkılap konularını tamamladın!'],'wandering-english':['🌍','Gezgin Tüccar','İngilizce testlerinde 500 XP topladın!'],'totem-religion':['🌙','Ölümsüzlük Totemi','Din testlerinde 5 ardışık %100!'],'speed-potion-2':['☄️','Hız İksiri II','Hızda 15 sn altında soru çözdün!'],'mending-book':['🛠️','Tamir Büyüsü','20 yanlışı doğruya çevirdin!'],'phantom-hunter':['🦇','Fantom Avcısı','Gece 22:00 sonrası 1 saat odak!'],'sunrise-clock':['🌅','Gündoğumu','07:00 öncesi giriş yapıp görev bitirdin!'],'mining-fatigue':['⛏️','Madenci Yorgunluğu','Tek oturumda 3 saat çalıştın!'],'respawn-anchor':['⚓','Yeniden Doğma Çapası','Denemede 20 net artışı yakaladın!'],'emerald-block':['🟩','Zümrüt Bloğu','Cüzdanda 5000 XP biriktirdin!'],'item-frame':['🖼️','Koleksiyoncu','5 farklı kategoride market alışı!'],'dye-crafter':['🎨','Boya Ustası','Tüm temaları kullandın!'],'unbreaking-3':['🛡️','Kırılmazlık III','30 gün kesintisiz ziyaret!'],'the-void':['🌌','Hiçlik (The Void)','Plansız ekstra konu çalıştın!'],'netherite-upgrade':['🪨','Netherit Yükseltmesi','3 denemede üst üste 80 net!'],'warden-slayer':['👹','Warden Avcısı','Tüm zor MEB konularını bitirdin!'],'elytra-flight':['🪽','Elytra','Hızda 50 soruyu sıfır hatayla geçtin!'],'campfire-rest':['🔥','Kamp Ateşi','4 pomodoro + 1 uzun mola döngüsü!'],'clock-sync':['⏰','Saat','3 gün üst üste zamanında başladın!'],'spyglass-focus':['🔭','Dürbün','Tek derste 150 soru çözdün!'],'glowstone-night':['💡','Işıktaşı','Gece yarısı 50 netli deneme bitirdin!'],'slimeball-stuck':['🟩','Balçık Topu','İlk soruyu sorulacaklara ekledin!'],'observer-stats':['👁️','Gözlemci','10 dk hata analizi yaptın!'],'golden-apple':['🍎','Altın Elma','3 yanlış sonrası 5 ardışık doğru!'],'enchanted-apple':['🌟','Büyülü Altın Elma','Tek günde 500 soru barajı!'],'shield-defense':['🛡️','Kalkan','Zayıf derste yanlışları yarıya indirdin!'],'anvil-repair':['🗜️','Örs','Zor seviye 5 test tamamladın!'],'compass-nav':['🧭','Pusula','Haftalık programı eksiksiz oluşturdun!'],'shulker-box':['🧰','Shulker Kutusu','50 soru kaydettin!'],'note-block':['🎵','Nota Bloğu','Odak müziğini 10 kez aktifleştirdin!'],'command-block':['⚙️','Komut Bloğu','Ayarlarda 3 değişiklik yaptın!'],'jukebox-party':['📻','Müzik Kutusu',"Haftalık hedeflerin %100'ünü tamamladın!"],'bookshelf-meb':['📚','Kitaplık','MEB sorularının yarısını bitirdin!'],'ender-pearl':['🔮','Ender İncisi','10 soruyu 5 dk\'da çözdün!'],'chorus-fruit':['🌺','Koro Meyvesi','Konfor alanından çıkıp 2 ekstra test!'],'trident-loyalty':['🔱','Sadakat Mızrağı','60 gün kesintisiz giriş!'],'nether-star':['⭐','Nether Yıldızı','Türkiye Geneli denemesini sisteme girdin!']};
+
+        function checkAndUnlock(id) {
+            if (appData.achievements[id]) return false;
+            const dep=ACH_DEPS[id]; if(dep&&!appData.achievements[dep]) return false;
+            appData.achievements[id]=true;
+            const xp=ACH_XP[id]||0;
+            if(xp>0){appData.xpTotal+=xp;appData.xpBalance+=xp;}
+            saveData(appData); updateHeader(); _showAchToast(id,xp);
+            if(id!=='lgs-slayer'){const all=Object.keys(ACH_DEPS).filter(k=>k!=='lgs-slayer');if(all.every(k=>appData.achievements[k]))setTimeout(()=>checkAndUnlock('lgs-slayer'),1200);}
+            return true;
+        }
+        function _showAchToast(id,xp) {
+            const info=ACH_NAMES[id]; if(!info) return;
+            let c=document.getElementById('_ach-toast-container');
+            if(!c){c=document.createElement('div');c.id='_ach-toast-container';c.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;gap:10px;align-items:center;pointer-events:none;';document.body.appendChild(c);}
+            const t=document.createElement('div');
+            t.style.cssText='background:#000;border:2px solid #ffaa00;border-radius:14px;padding:14px 22px;display:flex;align-items:center;gap:14px;box-shadow:0 0 28px rgba(255,170,0,0.5);opacity:0;transform:translateY(24px) scale(0.95);transition:opacity 0.35s ease,transform 0.35s cubic-bezier(0.34,1.56,0.64,1);max-width:420px;min-width:280px;';
+            t.innerHTML=`<div style="font-size:32px">${info[0]}</div><div><div style="font-size:9px;color:#ffaa00;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">🏆 BAŞARIM AÇILDI!</div><div style="font-size:14px;font-weight:bold;color:#fff;margin-bottom:2px;">${info[1]}</div><div style="font-size:11px;color:#666;">${info[2]}</div></div>${xp>0?`<div style="font-size:13px;font-weight:bold;color:#ffaa00;white-space:nowrap;margin-left:auto;">+${xp} XP</div>`:''}`;
+            c.appendChild(t);
+            requestAnimationFrame(()=>requestAnimationFrame(()=>{t.style.opacity='1';t.style.transform='translateY(0) scale(1)';}));
+            setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(-12px) scale(0.96)';setTimeout(()=>t.remove(),400);},3500);
+        }
+        const ALL_PAGES=['index','meb','deneme','hiz','achievements'];
+        function registerPage(p){if(!appData.visitedPages.includes(p)){appData.visitedPages.push(p);saveData(appData);}if(ALL_PAGES.every(x=>appData.visitedPages.includes(x)))checkAndUnlock('haritaci');}
+
+        /* ── TEMA ─────────────────────────────────────────── */
+        const themes=['','theme-cyan','theme-purple','theme-green'];
+        function applyTheme(){document.body.className=themes[appData.themeIdx]||'';}
+        function cycleTheme(){appData.themeIdx=(appData.themeIdx+1)%themes.length;saveData(appData);applyTheme();}
+
+        /* ── HEADER ───────────────────────────────────────── */
+        function updateHeader() {
+            const level=Math.floor(appData.xpTotal/100)+1;
+            document.getElementById('level').innerText=level;
+            document.getElementById('xp-balance').innerText=appData.xpBalance;
+            document.getElementById('header-xp-bar').style.width=(appData.xpTotal%100)+'%';
+            const ranks=['ÇAYLAK','DENEYİMLİ','USTA','FENLİSELİ','EFSANE'];
+            document.getElementById('rank-name').innerText=ranks[Math.min(level-1,4)];
+        }
+
+        /* ── ZAMANLAYICI STATE ────────────────────────────── */
+        let hizTimerInterval=null, hizRunning=false, hizTimeLeft=40*60, oturumBaslangic=null;
+
+        function onAyarDegis() {
+            if(hizRunning) return;
+            hizTimeLeft=parseInt(document.getElementById('hiz-dk').value)*60;
+            updateTimerUI();
+            const soruSayisi=parseInt(document.getElementById('hiz-soru').value);
+            if(appData.hizSorular.length!==soruSayisi){appData.hizSorular=Array(soruSayisi).fill('bos');saveData(appData);}
+            renderSoruGrid(); hideSonucPanel();
+        }
+
+        function startHizMod() {
+            if(hizRunning) return;
+            hizRunning=true;
+            if(!oturumBaslangic) oturumBaslangic=new Date();
+            hizTimerInterval=setInterval(()=>{
+                if(hizTimeLeft<=0){pauseHizMod();finishHizMod();}
+                else{hizTimeLeft--;updateTimerUI();updateSpeedDisplay();}
+            },1000);
+            document.getElementById('hiz-speed-display').classList.add('active');
+        }
+
+        function pauseHizMod() {
+            hizRunning=false;
+            if(hizTimerInterval){clearInterval(hizTimerInterval);hizTimerInterval=null;}
+            document.getElementById('hiz-speed-display').classList.remove('active');
+        }
+
+        function resetHizMod() {
+            pauseHizMod(); oturumBaslangic=null;
+            hizTimeLeft=parseInt(document.getElementById('hiz-dk').value)*60;
+            appData.hizSorular=Array(parseInt(document.getElementById('hiz-soru').value)).fill('bos');
+            saveData(appData); updateTimerUI(); renderSoruGrid(); hideSonucPanel();
+            document.getElementById('hiz-speed-display').textContent='— soru/dk';
+            document.getElementById('hiz-speed-display').classList.remove('active');
+        }
+
+        function finishHizMod() {
+            pauseHizMod();
+            const ders      = document.getElementById('hiz-ders').value;
+            const sure      = parseInt(document.getElementById('hiz-dk').value);
+            const soruSayisi= appData.hizSorular.length;
+            const dogru     = appData.hizSorular.filter(s=>s==='dogru').length;
+            const yanlis    = appData.hizSorular.filter(s=>s==='yanlis').length;
+            const bos       = appData.hizSorular.filter(s=>s==='bos').length;
+            const gecenDk   = oturumBaslangic ? Math.max(1,Math.round((Date.now()-oturumBaslangic.getTime())/60000)) : sure;
+            const soruPerDk = gecenDk>0 ? (dogru/gecenDk).toFixed(1) : '0.0';
+            const kazanilanXP = dogru*5;
+            appData.xpTotal+=kazanilanXP; appData.xpBalance+=kazanilanXP;
+
+            appData.hizHistory.unshift({tarih:new Date().toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}),ders,sure,soru:soruSayisi,dogru,yanlis,bos,xp:kazanilanXP,soruPerDk:parseFloat(soruPerDk)});
+            if(appData.hizHistory.length>20) appData.hizHistory=appData.hizHistory.slice(0,20);
+
+            /* speedrunner: 20 soru, 10 dakika altı, 20 doğru */
+            if (soruSayisi>=20 && gecenDk<10 && dogru>=20) {
+                checkAndUnlock('speedrunner');
+            }
+
+            /* enchanting: tüm hız modu oturumlarının toplam sorusu 1000+ */
+            const toplamHizSoru = appData.hizHistory.reduce((s,h)=>s+(h.dogru+h.yanlis),0);
+            if (toplamHizSoru>=1000) checkAndUnlock('enchanting');
+
+            /* speed-potion-2: soru başına ortalama 15 sn altı (gecenDk*60/soruSayisi < 15) */
+            const saniyePerSoru = (gecenDk*60) / Math.max(1,soruSayisi);
+            if (soruSayisi>=5 && saniyePerSoru<15 && dogru>0) checkAndUnlock('speed-potion-2');
+
+            /* elytra-flight: üst üste 50 soru hiç yanlış yok */
+            if (dogru>=50 && yanlis===0 && bos===0) checkAndUnlock('elytra-flight');
+
+            /* ender-pearl: 10 soru toplam 5 dk altında (gecenDk<5 ve soruSayisi>=10) */
+            if (soruSayisi>=10 && gecenDk<5 && dogru>=8) checkAndUnlock('ender-pearl');
+
+            /* spyglass-focus: tek oturumda 150 soru (soruSayisi>=150 veya tarihçe birikimi) */
+            if (!appData.spyglassProgress) appData.spyglassProgress = {};
+            const dersKodu = document.getElementById('hiz-ders').value;
+            appData.spyglassProgress[dersKodu] = (appData.spyglassProgress[dersKodu]||0) + dogru;
+            if (Object.values(appData.spyglassProgress).some(v=>v>=150)) checkAndUnlock('spyglass-focus');
+
+            /* mending-book: yanlışları takip et, 20 yanlış sonra doğruya çevrilirse */
+            if (!appData.mendingStats) appData.mendingStats = {totalYanlis:0, duzeltilen:0};
+            appData.mendingStats.totalYanlis += yanlis;
+            /* duzeltilen: önceki oturumda yanlış olan sorular bu oturumda doğruysa +1 say (yaklaşım: her oturumda dogru/toplam oranı iyileşiyorsa) */
+            if (appData.hizHistory.length>=2) {
+                const prev = appData.hizHistory[1];
+                const prevRate = prev.dogru/(prev.soru||1);
+                const currRate = dogru/Math.max(1,soruSayisi);
+                if (currRate > prevRate && yanlis < prev.yanlis) {
+                    appData.mendingStats.duzeltilen = (appData.mendingStats.duzeltilen||0) + (prev.yanlis - yanlis);
+                }
+            }
+            if ((appData.mendingStats.duzeltilen||0)>=20) checkAndUnlock('mending-book');
+
+            /* beacon-light: Level 10 */
+            if (Math.floor(appData.xpTotal/100)+1 >= 10) checkAndUnlock('beacon-light');
+
+            saveData(appData); updateHeader();
+            showSonucPanel(dogru,yanlis,bos,kazanilanXP,soruPerDk);
+            renderHizHistory(); showToast(kazanilanXP);
+            oturumBaslangic=null;
+        }
+
+        function toggleSoruDurum(idx) {
+            const d=['bos','dogru','yanlis'];
+            appData.hizSorular[idx]=d[(d.indexOf(appData.hizSorular[idx])+1)%3];
+            saveData(appData);
+            updateSoruBox(idx,appData.hizSorular[idx]);
+            updateSayaclar();
+        }
+        function updateSoruBox(idx,durum){const b=document.getElementById(`soru-${idx}`);if(b) b.className=`soru-box ${durum}`;}
+
+        function renderSoruGrid() {
+            const soruSayisi=parseInt(document.getElementById('hiz-soru').value);
+            if(appData.hizSorular.length!==soruSayisi) appData.hizSorular=Array(soruSayisi).fill('bos');
+            document.getElementById('soru-count').textContent=soruSayisi+' Soru';
+            const grid=document.getElementById('soru-grid'); grid.innerHTML='';
+            for(let i=0;i<soruSayisi;i++){
+                const b=document.createElement('div');
+                b.id=`soru-${i}`; b.className=`soru-box ${appData.hizSorular[i]||'bos'}`;
+                b.textContent=i+1; b.onclick=()=>toggleSoruDurum(i);
+                grid.appendChild(b);
+            }
+            updateSayaclar();
+        }
+        function updateSayaclar(){
+            document.getElementById('sayac-dogru').textContent=appData.hizSorular.filter(s=>s==='dogru').length;
+            document.getElementById('sayac-yanlis').textContent=appData.hizSorular.filter(s=>s==='yanlis').length;
+            document.getElementById('sayac-bos').textContent=appData.hizSorular.filter(s=>s==='bos').length;
+        }
+        function updateTimerUI(){
+            const m=Math.floor(hizTimeLeft/60),s=hizTimeLeft%60;
+            const el=document.getElementById('hiz-timer');
+            el.textContent=`${m}:${s<10?'0'+s:s}`;
+            hizTimeLeft<=60&&hizRunning?el.classList.add('urgent'):el.classList.remove('urgent');
+        }
+        function updateSpeedDisplay(){
+            if(!oturumBaslangic||!hizRunning) return;
+            const dk=(Date.now()-oturumBaslangic.getTime())/60000;
+            const dogru=appData.hizSorular.filter(s=>s==='dogru').length;
+            document.getElementById('hiz-speed-display').textContent=`${dk>0?(dogru/dk).toFixed(1):'0.0'} soru/dk`;
+        }
+        function showSonucPanel(d,y,b,xp,spd){document.getElementById('sonuc-dogru').textContent=d;document.getElementById('sonuc-yanlis').textContent=y;document.getElementById('sonuc-bos').textContent=b;document.getElementById('sonuc-xp').textContent='+'+xp;document.getElementById('sonuc-speed-text').textContent=`Ortalama Hız: ${spd} doğru/dakika`;document.getElementById('sonuc-panel').classList.add('show');}
+        function hideSonucPanel(){document.getElementById('sonuc-panel').classList.remove('show');}
+        function renderHizHistory(){
+            const list=document.getElementById('hiz-history-list');
+            document.getElementById('kayit-sayac').textContent=`${appData.hizHistory.length} kayıt`;
+            if(!appData.hizHistory.length){list.innerHTML='<div style="text-align:center;color:#2a2a2a;padding:24px;font-size:12px;">Henüz tamamlanan oturum yok.</div>';return;}
+            list.innerHTML=appData.hizHistory.map(item=>`<div class="hiz-history-item"><div class="history-sol"><span class="history-tarih">${item.tarih}</span><span class="history-detay">${item.ders} · ${item.sure} dk · ${item.soru} soru</span></div><div class="history-sag"><div class="history-stats">✅ ${item.dogru} &nbsp; ❌ ${item.yanlis} &nbsp; ⭕ ${item.bos}${item.soruPerDk?`<span class="history-speed">${item.soruPerDk} s/dk</span>`:''}</div><div class="history-xp">+${item.xp} XP</div></div></div>`).join('');
+        }
+        let toastTimer;
+        function showToast(xp){const t=document.getElementById('xp-toast');t.textContent=`⚡ +${xp} XP KAZANILDI!`;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2800);}
+        function updateLGSMini(){const days=Math.floor((new Date('June 14, 2026 09:30:00').getTime()-Date.now())/86400000);const el=document.getElementById('lgs-days-mini');if(el)el.textContent=days;}
+
+        /* ── BAŞLANGIÇ ────────────────────────────────────── */
+        applyTheme(); updateHeader();
+        const kayitliSoruSayisi=appData.hizSorular.length;
+        if([10,20,30,40,50].includes(kayitliSoruSayisi)) document.getElementById('hiz-soru').value=kayitliSoruSayisi;
+        hizTimeLeft=parseInt(document.getElementById('hiz-dk').value)*60;
+        updateTimerUI(); renderSoruGrid(); renderHizHistory(); updateLGSMini();
+        registerPage('hiz');
+    </script>
+</body>
+</html>

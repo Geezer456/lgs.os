@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Başarımlar · LGS.OS</title>
+    <style>
+        :root { --primary:#ff8800; --primary-glow:rgba(255,136,0,0.6); --bg:#050505; --card:#111; --text:#ddd; --accent:#00ff88; --header-bg:#000; --danger:#ff3333; --mc-green:#55ff55; --mc-green-glow:rgba(85,255,85,0.8); --mc-purple:#aa00ff; --mc-gold:#ffaa00; --mc-gold-glow:rgba(255,170,0,0.7); }
+        body.theme-cyan   { --primary:#00f2ff; --primary-glow:rgba(0,242,255,0.6); }
+        body.theme-purple { --primary:#bc13fe; --primary-glow:rgba(188,19,254,0.6); }
+        body.theme-green  { --primary:#39ff14; --primary-glow:rgba(57,255,20,0.6); }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { font-family:'Segoe UI',sans-serif; background:var(--bg); color:var(--text); display:flex; flex-direction:column; height:100vh; overflow:hidden; transition:0.3s; }
+        .top-header { width:100%; height:60px; background:var(--header-bg); border-bottom:2px solid #222; display:flex; align-items:center; justify-content:space-between; padding:0 20px; flex-shrink:0; z-index:1000; }
+        .logo { color:var(--primary); font-weight:bold; font-size:20px; letter-spacing:2px; text-shadow:0 0 10px var(--primary-glow); }
+        .header-stats { display:flex; align-items:center; gap:12px; width:380px; }
+        .lvl-box { font-weight:bold; color:var(--primary); font-size:14px; }
+        .header-xp-container { flex:1; height:10px; background:#222; border-radius:5px; overflow:hidden; border:1px solid #333; }
+        #header-xp-bar { height:100%; background:var(--primary); width:0%; transition:width 0.5s; box-shadow:0 0 8px var(--primary); }
+        .rank-tag { font-size:10px; background:var(--primary); color:#000; padding:2px 6px; border-radius:4px; font-weight:bold; white-space:nowrap; }
+        button, .nav-link { padding:6px 10px; font-size:10px; border:1px solid var(--primary); background:transparent; color:var(--primary); cursor:pointer; font-weight:bold; transition:0.3s; border-radius:12px !important; text-decoration:none; display:inline-block; line-height:normal; white-space:nowrap; }
+        button:hover, .nav-link:hover { background:var(--primary); color:#000; box-shadow:0 0 8px var(--primary-glow); }
+        .achievements-link { border-color:var(--mc-green) !important; color:var(--mc-green) !important; box-shadow:0 0 10px var(--mc-green-glow); }
+        .achievements-link:hover, .achievements-link.active-nav { background:var(--mc-green) !important; color:#000 !important; box-shadow:0 0 16px var(--mc-green-glow); }
+        .map-viewport { flex:1; overflow:auto; position:relative; background-color:#080808; background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.018) 39px,rgba(255,255,255,0.018) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,0.018) 39px,rgba(255,255,255,0.018) 40px); cursor:grab; }
+        .map-viewport:active { cursor:grabbing; }
+        .map-viewport::-webkit-scrollbar { width:6px; height:6px; }
+        .map-viewport::-webkit-scrollbar-track { background:#000; }
+        .map-viewport::-webkit-scrollbar-thumb { background:#2a2a2a; border-radius:3px; }
+        .map-viewport::-webkit-scrollbar-thumb:hover { background:var(--primary); }
+        .map-canvas { width:3800px; height:2600px; position:relative; }
+        .connectors-svg { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; }
+        .conn-locked { stroke:#1e1e1e; stroke-width:3; stroke-dasharray:8 7; fill:none; }
+        .conn-unlocked { stroke:var(--mc-gold); stroke-width:3; fill:none; filter:drop-shadow(0 0 5px var(--mc-gold-glow)); animation:connGlow 2.5s ease-in-out infinite; }
+        @keyframes connGlow { 0%,100%{opacity:1;filter:drop-shadow(0 0 5px var(--mc-gold-glow))} 50%{opacity:0.55;filter:drop-shadow(0 0 12px var(--mc-gold-glow))} }
+        .ach-node { position:absolute; width:90px; display:flex; flex-direction:column; align-items:center; cursor:pointer; z-index:10; transition:transform 0.2s; }
+        .ach-node:hover { transform:scale(1.1); z-index:50; }
+        .ach-box { width:68px; height:68px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:30px; border:3px solid #1e1e1e; background:#080808; box-shadow:0 4px 0 #000; transition:border-color 0.4s,box-shadow 0.4s,background 0.4s; }
+        .ach-node.locked .ach-box      { filter:grayscale(1) brightness(0.25); }
+        .ach-node.hidden-locked .ach-box { filter:grayscale(1) brightness(0.1); border-color:#111; }
+        .ach-node.unlocked .ach-box    { border-color:var(--mc-green); background:rgba(85,255,85,0.07); box-shadow:0 0 16px var(--mc-green-glow),0 4px 0 #000; filter:none; animation:pulseGreen 2s ease-in-out infinite; }
+        .ach-node.unlocked.secret .ach-box { border-color:var(--mc-gold); background:rgba(255,170,0,0.07); box-shadow:0 0 16px var(--mc-gold-glow),0 4px 0 #000; animation:pulseGold 2s ease-in-out infinite; }
+        .ach-node.unlocked.final .ach-box  { border-color:var(--mc-purple); background:rgba(170,0,255,0.1); box-shadow:0 0 24px rgba(170,0,255,0.8),0 4px 0 #000; animation:pulsePurple 1.8s ease-in-out infinite; }
+        @keyframes pulseGreen  { 0%,100%{box-shadow:0 0 16px var(--mc-green-glow),0 4px 0 #000} 50%{box-shadow:0 0 28px var(--mc-green-glow),0 4px 0 #000} }
+        @keyframes pulseGold   { 0%,100%{box-shadow:0 0 16px var(--mc-gold-glow),0 4px 0 #000}  50%{box-shadow:0 0 28px var(--mc-gold-glow),0 4px 0 #000} }
+        @keyframes pulsePurple { 0%,100%{box-shadow:0 0 24px rgba(170,0,255,0.8),0 4px 0 #000}  50%{box-shadow:0 0 40px rgba(170,0,255,1.0),0 4px 0 #000} }
+        .ach-name { font-size:9px; font-weight:bold; text-align:center; margin-top:6px; color:#333; line-height:1.3; width:90px; transition:color 0.4s; }
+        .ach-node.unlocked .ach-name         { color:var(--mc-green); }
+        .ach-node.unlocked.secret .ach-name  { color:var(--mc-gold); }
+        .ach-node.unlocked.final  .ach-name  { color:var(--mc-purple); text-shadow:0 0 8px rgba(170,0,255,0.8); }
+        .ach-node.hidden-locked   .ach-name  { color:#1a1a1a; }
+        .ach-badge { font-size:7px; padding:1px 5px; border-radius:6px; margin-top:3px; font-weight:bold; letter-spacing:0.5px; }
+        .badge-normal   { background:#1a1a1a; color:#444; }
+        .badge-zor      { background:rgba(255,51,51,0.15); color:var(--danger); }
+        .badge-efsanevi { background:rgba(255,170,0,0.15); color:var(--mc-gold); }
+        .badge-gizli    { background:rgba(170,0,255,0.15); color:var(--mc-purple); }
+        .badge-final    { background:rgba(170,0,255,0.2); color:var(--mc-purple); }
+        .badge-sistemsel{ background:rgba(0,242,255,0.15); color:#00f2ff; }
+        .mc-rank-bar { height:46px; background:rgba(0,0,0,0.95); border-top:2px solid #1a1a1a; display:flex; align-items:center; justify-content:space-between; padding:0 24px; flex-shrink:0; }
+        #mc-rank-text { font-size:14px; font-weight:bold; color:var(--mc-gold); text-shadow:0 0 10px var(--mc-gold-glow); letter-spacing:1px; }
+        .rank-bar-right { display:flex; align-items:center; gap:16px; font-size:11px; color:#444; }
+        .rank-bar-right span { color:var(--primary); font-weight:bold; }
+        .rank-progress-bg { width:160px; height:6px; background:#1a1a1a; border-radius:3px; overflow:hidden; }
+        #rank-progress-fill { height:100%; background:var(--mc-gold); transition:width 0.6s; box-shadow:0 0 6px var(--mc-gold-glow); }
+        .mc-tooltip { position:fixed; background:rgba(5,5,5,0.98); border:2px solid #333; border-radius:8px; padding:13px 16px; max-width:250px; z-index:9999; pointer-events:none; display:none; box-shadow:0 8px 24px rgba(0,0,0,0.9); }
+        .mc-tooltip.show { display:block; }
+        .tooltip-icon  { font-size:28px; margin-bottom:8px; text-align:center; }
+        .tooltip-title { font-weight:bold; font-size:13px; margin-bottom:5px; }
+        .tooltip-desc  { font-size:11px; color:#777; line-height:1.5; margin-bottom:7px; }
+        .tooltip-status { font-size:10px; font-weight:bold; padding:3px 8px; border-radius:4px; display:inline-block; }
+        .ts-open  { background:rgba(85,255,85,0.1);  color:var(--mc-green);  border:1px solid var(--mc-green); }
+        .ts-locked{ background:rgba(60,60,60,0.2);   color:#555;             border:1px solid #2a2a2a; }
+        .ts-secret{ background:rgba(255,170,0,0.1);  color:var(--mc-gold);   border:1px solid var(--mc-gold); }
+        .ts-final { background:rgba(170,0,255,0.1);  color:var(--mc-purple); border:1px solid var(--mc-purple); }
+        .map-zone-label { position:absolute; font-size:9px; color:#1e1e1e; font-weight:bold; letter-spacing:3px; text-transform:uppercase; pointer-events:none; border-bottom:1px solid #161616; padding-bottom:3px; }
+    </style>
+</head>
+<body id="mainBody">
+    <header class="top-header">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div class="logo">⚡ LGS.OS</div>
+            <a class="nav-link" href="index.html">🏠 ANA SAYFA</a>
+            <button onclick="cycleTheme()">TEMA</button>
+            <a class="nav-link" href="meb.html">📚 MEB KONU</a>
+            <a class="nav-link" href="deneme.html">📊 DENEME</a>
+            <a class="nav-link" href="hiz.html">⚡ HIZ MODU</a>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <a class="nav-link achievements-link active-nav" href="achievements.html">🏆 BAŞARIMLAR</a>
+            <div class="header-stats">
+                <span class="rank-tag" id="rank-name">ÇAYLAK</span>
+                <div class="lvl-box">LVL <span id="level">1</span></div>
+                <div class="header-xp-container"><div id="header-xp-bar"></div></div>
+                <div style="font-size:11px;color:var(--primary);font-weight:bold;"><span id="xp-balance">0</span> XP</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="map-viewport" id="map-viewport">
+        <div class="map-canvas" id="map-canvas">
+            <svg class="connectors-svg" id="connectors-svg"></svg>
+        </div>
+    </div>
+
+    <div class="mc-rank-bar">
+        <div style="display:flex; align-items:center; gap:15px;">
+            <div id="mc-rank-text">Rütbe: Acemi Madenci 🪓</div>
+            
+            <a href="guide.html" class="nav-link" style="border-color:var(--mc-gold) !important; color:var(--mc-gold) !important; box-shadow:0 0 5px var(--mc-gold-glow); font-size:11px; padding:4px 12px;">
+                📖 REHBER / GUIDE
+            </a>
+        </div>
+
+        <div class="rank-bar-right">
+            <div><span id="mc-open-count">0</span> / 60 Başarım</div>
+            <div class="rank-progress-bg"><div id="rank-progress-fill" style="width:0%"></div></div>
+        </div>
+    </div>
+
+    <div class="mc-tooltip" id="mc-tooltip">
+        <div class="tooltip-icon"   id="tooltip-icon"></div>
+        <div class="tooltip-title"  id="tooltip-title"></div>
+        <div class="tooltip-desc"   id="tooltip-desc"></div>
+        <div class="tooltip-status" id="tooltip-status"></div>
+    </div>
+
+    <script>
+        /* ── VERİ ─────────────────────────────────────────── */
+        const STORAGE_KEY = 'LGS_GAMER_OS_DATA';
+        function loadData() {
+            try { const r=localStorage.getItem(STORAGE_KEY); if(r) return JSON.parse(r); } catch(e) {}
+            return { xpTotal:0,xpBalance:0,themeIdx:0,tasks:[],todos:[],planData:{},mebData:{},denemeler:[],hizHistory:[],hizSorular:Array(40).fill('bos'),achievements:{},visitedPages:[],achievementOpenCount:0 };
+        }
+        function saveData(d) { localStorage.setItem(STORAGE_KEY,JSON.stringify(d)); }
+        let appData = loadData();
+        if (!appData.achievements)    appData.achievements = {};
+        if (!appData.visitedPages)    appData.visitedPages = [];
+        if (!appData.achievementOpenCount) appData.achievementOpenCount = 0;
+
+        /* ── ACHIEVEMENT ENGINE ───────────────────────────── */
+        const ACH_XP = {'crafting-table':10,'stone-age':20,'iron-armor':30,'diamond-ore':50,'enchanting':75,'dragon-breath':100,'speedrunner':40,'invis-potion':60,'firin-ustasi':15,'potion-master':35,'trade-center':50,'haritaci':25,'redstone-eng':30,'beacon-light':80,'villager-friend':25,'world-traveler':20,'monster-hunter':20,'wither-slayer':60,'hardcore-mode':90,'lgs-slayer':200,'redstone-math':40,'enchant-translator':45,'brewing-science':25,'ancient-history':80,'wandering-english':20,'totem-religion':40,'speed-potion-2':15,'mending-book':35,'phantom-hunter':50,'sunrise-clock':20,'mining-fatigue':70,'respawn-anchor':45,'emerald-block':90,'item-frame':20,'dye-crafter':25,'unbreaking-3':100,'the-void':30,'netherite-upgrade':60,'warden-slayer':85,'elytra-flight':50,'campfire-rest':25,'clock-sync':40,'spyglass-focus':45,'glowstone-night':55,'slimeball-stuck':10,'observer-stats':20,'golden-apple':40,'enchanted-apple':100,'shield-defense':35,'anvil-repair':40,'compass-nav':25,'shulker-box':20,'note-block':15,'command-block':15,'jukebox-party':30,'bookshelf-meb':90,'ender-pearl':70,'chorus-fruit':35,'trident-loyalty':120,'nether-star':150};
+        const ACH_DEPS = {'crafting-table':null,'stone-age':'crafting-table','iron-armor':'stone-age','diamond-ore':'iron-armor','enchanting':'diamond-ore','dragon-breath':'enchanting','speedrunner':'iron-armor','invis-potion':'speedrunner','firin-ustasi':'crafting-table','potion-master':'firin-ustasi','trade-center':'potion-master','haritaci':'crafting-table','redstone-eng':'haritaci','beacon-light':'redstone-eng','villager-friend':'beacon-light','world-traveler':'villager-friend','monster-hunter':'crafting-table','wither-slayer':'monster-hunter','hardcore-mode':'wither-slayer','lgs-slayer':'dragon-breath','redstone-math':'stone-age','enchant-translator':'stone-age','brewing-science':'potion-master','ancient-history':'dragon-breath','wandering-english':'haritaci','totem-religion':'dragon-breath','speed-potion-2':'speedrunner','mending-book':'speedrunner','phantom-hunter':'invis-potion','sunrise-clock':'villager-friend','mining-fatigue':'invis-potion','respawn-anchor':'diamond-ore','emerald-block':'trade-center','item-frame':'firin-ustasi','dye-crafter':'haritaci','unbreaking-3':'villager-friend','the-void':'redstone-eng','netherite-upgrade':'diamond-ore','warden-slayer':'dragon-breath','elytra-flight':'speedrunner','campfire-rest':'invis-potion','clock-sync':'villager-friend','spyglass-focus':'mining-fatigue','glowstone-night':'phantom-hunter','slimeball-stuck':'crafting-table','observer-stats':'slimeball-stuck','golden-apple':'respawn-anchor','enchanted-apple':'golden-apple','shield-defense':'enchanted-apple','anvil-repair':'shield-defense','compass-nav':'redstone-eng','shulker-box':'compass-nav','note-block':'campfire-rest','command-block':'dye-crafter','jukebox-party':'redstone-eng','bookshelf-meb':'dragon-breath','ender-pearl':'speedrunner','chorus-fruit':'brewing-science','trident-loyalty':'unbreaking-3','nether-star':'trident-loyalty'};
+        const ACH_NAMES = {'crafting-table':['🪵','Odun Çağı','Sisteme ilk içeriğini girdin!'],'stone-age':['⛏️','Taş Devri','10 görev tamamladın!'],'iron-armor':['🛡️','Demir Zırh','Bir denemede 50 neti geçtin!'],'diamond-ore':['💎','ELMAS!!!','Bir denemede 80 net üstü!'],'enchanting':['📖','Büyü Masası','Toplam 1000 soru çözdün!'],'dragon-breath':['🐲','Ejderha Nefesi','Tüm MEB konularını tamamladın!'],'speedrunner':['⚡','Speedrunner','20 soruyu 10 dakikada bitirdin!'],'invis-potion':['🌫️','Görünmezlik İksiri','120 dakika kesintisiz odak!'],'firin-ustasi':['🍞','Fırıncı','Marketten ilk yiyecek aldın!'],'potion-master':['🧪','İksir Ustası','10 kez Kahve/İçecek aldın!'],'trade-center':['💰','Ticaret Merkezi','Toplam 2000 XP harcadın!'],'haritaci':['🗺️','Haritacı','Tüm sayfaları keşfettin!'],'redstone-eng':['⚙️','Kızıltaş Mühendisi','Haftalık planını eksiksiz doldurdun!'],'beacon-light':['🗼','Fener (Beacon)','10. Seviyeye ulaştın!'],'villager-friend':['🧑‍🌾','Köylü Dostu','5 gün üst üste giriş yaptın!'],'world-traveler':['🌍','Dünya Gezgini','Başarımlar sayfasını 50 kez açtın!'],'monster-hunter':['⚔️','Canavar Avcısı','İlk Boss görevini tamamladın!'],'wither-slayer':['💀','Wither Avcısı','10 Boss görevi tamamladın!'],'hardcore-mode':['💔','Hardcore Mod','Bir hafta sıfır sektirme!'],'lgs-slayer':['👑','LGS Slayer','TÜM başarımları açtın!'],'redstone-math':['📐','Kızıltaş Hesap Makinesi','Mat testlerinde 100 doğruya ulaştın!'],'enchant-translator':['📖','Büyü Masası Çevirmeni','Türkçede 3 testi hatasız bitirdin!'],'brewing-science':['🧪','İksir Tezgahı','Fen sorularından 50 tane çözdün!'],'ancient-history':['📜','Antik Kalıntı','Sosyal/İnkılap konularını tamamladın!'],'wandering-english':['🌍','Gezgin Tüccar','İngilizce testlerinde 500 XP topladın!'],'totem-religion':['🌙','Ölümsüzlük Totemi','Din testlerinde 5 ardışık %100!'],'speed-potion-2':['☄️','Hız İksiri II','Hızda 15 sn altında soru çözdün!'],'mending-book':['🛠️','Tamir Büyüsü','20 yanlışı doğruya çevirdin!'],'phantom-hunter':['🦇','Fantom Avcısı','Gece 22:00 sonrası 1 saat odak!'],'sunrise-clock':['🌅','Gündoğumu','07:00 öncesi giriş yapıp görev bitirdin!'],'mining-fatigue':['⛏️','Madenci Yorgunluğu','Tek oturumda 3 saat çalıştın!'],'respawn-anchor':['⚓','Yeniden Doğma Çapası','Denemede 20 net artışı yakaladın!'],'emerald-block':['🟩','Zümrüt Bloğu','Cüzdanda 5000 XP biriktirdin!'],'item-frame':['🖼️','Koleksiyoncu','5 farklı kategoride market alışı!'],'dye-crafter':['🎨','Boya Ustası','Tüm temaları kullandın!'],'unbreaking-3':['🛡️','Kırılmazlık III','30 gün kesintisiz ziyaret!'],'the-void':['🌌','Hiçlik (The Void)','Plansız ekstra konu çalıştın!'],'netherite-upgrade':['🪨','Netherit Yükseltmesi','3 denemede üst üste 80 net!'],'warden-slayer':['👹','Warden Avcısı','Tüm zor MEB konularını bitirdin!'],'elytra-flight':['🪽','Elytra','Hızda 50 soruyu sıfır hatayla geçtin!'],'campfire-rest':['🔥','Kamp Ateşi','4 pomodoro + 1 uzun mola döngüsü!'],'clock-sync':['⏰','Saat','3 gün üst üste zamanında başladın!'],'spyglass-focus':['🔭','Dürbün','Tek derste 150 soru çözdün!'],'glowstone-night':['💡','Işıktaşı','Gece yarısı 50 netli deneme bitirdin!'],'slimeball-stuck':['🟩','Balçık Topu','İlk soruyu sorulacaklara ekledin!'],'observer-stats':['👁️','Gözlemci','10 dk hata analizi yaptın!'],'golden-apple':['🍎','Altın Elma','3 yanlış sonrası 5 ardışık doğru!'],'enchanted-apple':['🌟','Büyülü Altın Elma','Tek günde 500 soru barajı!'],'shield-defense':['🛡️','Kalkan','Zayıf derste yanlışları yarıya indirdin!'],'anvil-repair':['🗜️','Örs','Zor seviye 5 test tamamladın!'],'compass-nav':['🧭','Pusula','Haftalık programı eksiksiz oluşturdun!'],'shulker-box':['🧰','Shulker Kutusu','50 soru kaydettin!'],'note-block':['🎵','Nota Bloğu','Odak müziğini 10 kez aktifleştirdin!'],'command-block':['⚙️','Komut Bloğu','Ayarlarda 3 değişiklik yaptın!'],'jukebox-party':['📻','Müzik Kutusu','Haftalık hedeflerin %100\'ünü tamamladın!'],'bookshelf-meb':['📚','Kitaplık','MEB sorularının yarısını bitirdin!'],'ender-pearl':['🔮','Ender İncisi','10 soruyu 5 dk\'da çözdün!'],'chorus-fruit':['🌺','Koro Meyvesi','Konfor alanından çıkıp 2 ekstra test!'],'trident-loyalty':['🔱','Sadakat Mızrağı','60 gün kesintisiz giriş!'],'nether-star':['⭐','Nether Yıldızı','Türkiye Geneli denemesini sisteme girdin!']};
+
+        function checkAndUnlock(id) {
+            if (appData.achievements[id]) return false;
+            const dep=ACH_DEPS[id]; if(dep&&!appData.achievements[dep]) return false;
+            appData.achievements[id]=true;
+            const xp=ACH_XP[id]||0;
+            if(xp>0){appData.xpTotal+=xp;appData.xpBalance+=xp;}
+            saveData(appData); updateHeader(); _showAchToast(id,xp);
+            setTimeout(()=>renderMap(), 200);
+            if(id!=='lgs-slayer'){const all=Object.keys(ACH_DEPS).filter(k=>k!=='lgs-slayer');if(all.every(k=>appData.achievements[k]))setTimeout(()=>checkAndUnlock('lgs-slayer'),1200);}
+            return true;
+        }
+        function _showAchToast(id,xp) {
+            const info=ACH_NAMES[id]; if(!info) return;
+            let c=document.getElementById('_ach-toast-container');
+            if(!c){c=document.createElement('div');c.id='_ach-toast-container';c.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;gap:10px;align-items:center;pointer-events:none;';document.body.appendChild(c);}
+            const t=document.createElement('div');
+            t.style.cssText='background:#000;border:2px solid #ffaa00;border-radius:14px;padding:14px 22px;display:flex;align-items:center;gap:14px;box-shadow:0 0 28px rgba(255,170,0,0.5);opacity:0;transform:translateY(24px) scale(0.95);transition:opacity 0.35s ease,transform 0.35s cubic-bezier(0.34,1.56,0.64,1);max-width:420px;min-width:280px;';
+            t.innerHTML=`<div style="font-size:32px">${info[0]}</div><div><div style="font-size:9px;color:#ffaa00;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">🏆 BAŞARIM AÇILDI!</div><div style="font-size:14px;font-weight:bold;color:#fff;margin-bottom:2px;">${info[1]}</div><div style="font-size:11px;color:#666;">${info[2]}</div></div>${xp>0?`<div style="font-size:13px;font-weight:bold;color:#ffaa00;white-space:nowrap;margin-left:auto;">+${xp} XP</div>`:''}`;
+            c.appendChild(t);
+            requestAnimationFrame(()=>requestAnimationFrame(()=>{t.style.opacity='1';t.style.transform='translateY(0) scale(1)';}));
+            setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(-12px) scale(0.96)';setTimeout(()=>t.remove(),400);},3500);
+        }
+
+        /* ── SAYFA ZİYARET ────────────────────────────────── */
+        const ALL_PAGES = ['index','meb','deneme','hiz','achievements'];
+        function registerPage(p) {
+            if (!appData.visitedPages.includes(p)) { appData.visitedPages.push(p); saveData(appData); }
+            if (ALL_PAGES.every(x=>appData.visitedPages.includes(x))) checkAndUnlock('haritaci');
+        }
+
+        /* ── TEMA ─────────────────────────────────────────── */
+        const themes=['','theme-cyan','theme-purple','theme-green'];
+        function applyTheme(){document.body.className=themes[appData.themeIdx]||'';}
+        function cycleTheme(){appData.themeIdx=(appData.themeIdx+1)%themes.length;saveData(appData);applyTheme();}
+
+        /* ── HEADER ───────────────────────────────────────── */
+        function updateHeader() {
+            const level=Math.floor(appData.xpTotal/100)+1;
+            document.getElementById('level').innerText=level;
+            document.getElementById('xp-balance').innerText=appData.xpBalance;
+            document.getElementById('header-xp-bar').style.width=(appData.xpTotal%100)+'%';
+            const ranks=['ÇAYLAK','DENEYİMLİ','USTA','FENLİSELİ','EFSANE'];
+            document.getElementById('rank-name').innerText=ranks[Math.min(level-1,4)];
+        }
+
+        /* ══════════════════════════════════════════════════
+           BAŞARIM HARİTASI VERİSİ (ACH_DATA ile senkron)
+        ══════════════════════════════════════════════════ */
+        const ACH_DATA = [
+            /* ══ ESKİ 20 BAŞARIM (koordinatlar korundu) ══ */
+            {id:'crafting-table',name:'Odun Çağı',       icon:'🪵',tip:'Başlangıç',desc:'Sisteme ilk içeriğini gir.',             x:955, y:60,  requires:null,             secret:false},
+            {id:'stone-age',     name:'Taş Devri',        icon:'⛏️',tip:'Normal',   desc:'Toplam 10 görev tamamla.',              x:80,  y:260, requires:'crafting-table', secret:false},
+            {id:'iron-armor',    name:'Demir Zırh',       icon:'🛡️',tip:'Normal',   desc:'Bir denemede 50 net barajını geç.',      x:80,  y:480, requires:'stone-age',      secret:false},
+            {id:'diamond-ore',   name:'ELMAS!!!',         icon:'💎',tip:'Zor',      desc:'Bir denemede 80 net üstü yap.',          x:80,  y:700, requires:'iron-armor',     secret:false},
+            {id:'enchanting',    name:'Büyü Masası',      icon:'📖',tip:'Zor',      desc:'Toplamda 1000 soru çöz.',                x:80,  y:920, requires:'diamond-ore',    secret:false},
+            {id:'dragon-breath', name:'Ejderha Nefesi',   icon:'🐲',tip:'Efsanevi', desc:'MEB listesindeki tüm konuları tamamla.', x:80,  y:1140,requires:'enchanting',    secret:false},
+            {id:'speedrunner',   name:'Speedrunner',      icon:'⚡',tip:'Zor',      desc:'Hız modunda 20 soruyu 10 dk altında.',   x:360, y:700, requires:'iron-armor',     secret:false},
+            {id:'invis-potion',  name:'Görünmezlik İksiri',icon:'🌫️',tip:'Gizli',  desc:'Odak sayacını 120 dk çalıştır.',         x:360, y:920, requires:'speedrunner',    secret:true },
+            {id:'firin-ustasi',  name:'Fırıncı',          icon:'🍞',tip:'Normal',   desc:'Marketten ilk Yemek/Enerji al.',         x:660, y:260, requires:'crafting-table', secret:false},
+            {id:'potion-master', name:'İksir Ustası',     icon:'🧪',tip:'Normal',   desc:'Marketten 10 kez Kahve/İçecek al.',      x:660, y:480, requires:'firin-ustasi',   secret:false},
+            {id:'trade-center',  name:'Ticaret Merkezi',  icon:'💰',tip:'Normal',   desc:'Marketten toplam 2000 XP harca.',        x:660, y:700, requires:'potion-master',  secret:false},
+            {id:'haritaci',      name:'Haritacı',         icon:'🗺️',tip:'Sistemsel',desc:'Tüm sayfaları en az bir kez keşfet.',    x:980, y:260, requires:'crafting-table', secret:false},
+            {id:'redstone-eng',  name:'Kızıltaş Mühendisi',icon:'⚙️',tip:'Normal', desc:'Haftalık planını eksiksiz doldur.',      x:980, y:480, requires:'haritaci',       secret:false},
+            {id:'beacon-light',  name:'Fener (Beacon)',   icon:'🗼',tip:'Efsanevi', desc:'10. Seviyeye ulaş.',                     x:980, y:700, requires:'redstone-eng',   secret:false},
+            {id:'villager-friend',name:'Köylü Dostu',     icon:'🧑‍🌾',tip:'Normal',desc:'5 gün üst üste sisteme giriş yap.',      x:980, y:920, requires:'beacon-light',   secret:false},
+            {id:'world-traveler',name:'Dünya Gezgini',    icon:'🌍',tip:'Gizli',    desc:'Başarımlar sayfasını 50 kez aç.',        x:980, y:1140,requires:'villager-friend', secret:true },
+            {id:'monster-hunter',name:'Canavar Avcısı',   icon:'⚔️',tip:'Normal',  desc:'İlk Boss görevini tamamla.',             x:1300,y:260, requires:'crafting-table', secret:false},
+            {id:'wither-slayer', name:'Wither Avcısı',    icon:'💀',tip:'Zor',      desc:'10 tane Boss görevi tamamla.',           x:1300,y:480, requires:'monster-hunter', secret:false},
+            {id:'hardcore-mode', name:'Hardcore Mod',     icon:'💔',tip:'Gizli',    desc:'Bir hafta hiç görev sektirmeden ilerle.',x:1560,y:700, requires:'wither-slayer',  secret:true },
+            {id:'lgs-slayer',    name:'LGS Slayer',       icon:'👑',tip:'Final',    desc:'Diğer tüm başarımları aç.',              x:1550,y:1400,requires:'dragon-breath',  secret:true },
+
+            /* ══ YENİ 20 BAŞARIM ══ */
+            /* — DERS & BRANŞ DALI (sağ sütun x:1700-2000) — */
+            {id:'redstone-math',    name:'Kızıltaş Hesap M.',icon:'📐',tip:'Zor',      desc:'Mat testlerinde 100 doğruya ulaş.',       x:1700,y:260, requires:'stone-age',       secret:false},
+            {id:'enchant-translator',name:'Büyü Çevirmeni',  icon:'📖',tip:'Zor',      desc:'Türkçede 3 testi sıfır yanlış bitir.',    x:1700,y:480, requires:'stone-age',       secret:false},
+            {id:'brewing-science',  name:'İksir Tezgahı',    icon:'🧪',tip:'Normal',   desc:'Fen sorularından 50 tane çöz.',           x:1700,y:700, requires:'potion-master',   secret:false},
+            {id:'wandering-english',name:'Gezgin Tüccar',    icon:'🌍',tip:'Normal',   desc:'İngilizce testlerinde 500 XP topla.',     x:1700,y:920, requires:'haritaci',        secret:false},
+            {id:'totem-religion',   name:'Ölümsüzlük Totemi',icon:'🌙',tip:'Zor',      desc:'Din testlerinde 5 ardışık %100 yap.',     x:1700,y:1140,requires:'dragon-breath',   secret:false},
+            {id:'ancient-history',  name:'Antik Kalıntı',    icon:'📜',tip:'Efsanevi', desc:'Sosyal/İnkılap konularını tamamla.',      x:1960,y:1140,requires:'dragon-breath',   secret:false},
+
+            /* — PERFORMANS & HIZ DALI (x:360-660, y:1140+) — */
+            {id:'speed-potion-2',   name:'Hız İksiri II',    icon:'☄️',tip:'Normal',   desc:'Hızda ort. 15 sn altında çöz.',           x:360, y:1140,requires:'speedrunner',     secret:false},
+            {id:'elytra-flight',    name:'Elytra',           icon:'🪽',tip:'Zor',      desc:'Hızda 50 soruyu sıfır hatayla geç.',      x:580, y:1340,requires:'speedrunner',     secret:false},
+            {id:'mending-book',     name:'Tamir Büyüsü',     icon:'🛠️',tip:'Zor',      desc:'20 yanlışı tekrar doğruya çevir.',        x:360, y:1340,requires:'speedrunner',     secret:false},
+
+            /* — GECE/SABAH DALI (x:1100-1400, y:1340+) — */
+            {id:'phantom-hunter',   name:'Fantom Avcısı',    icon:'🦇',tip:'Gizli',    desc:'Gece 22:00+ sonrası 1 saat odak.',        x:1100,y:1340,requires:'invis-potion',    secret:true },
+            {id:'mining-fatigue',   name:'Madenci Yorgunluğu',icon:'⛏️',tip:'Efsanevi',desc:'Tek oturumda 3 saat kesintisiz çalış.',   x:1300,y:1140,requires:'invis-potion',    secret:false},
+            {id:'sunrise-clock',    name:'Gündoğumu',        icon:'🌅',tip:'Normal',   desc:'07:00 öncesi giriş yapıp görev bitir.',   x:1100,y:1140,requires:'villager-friend',  secret:false},
+            {id:'unbreaking-3',     name:'Kırılmazlık III',  icon:'🛡️',tip:'Efsanevi', desc:'30 gün kesintisiz ziyaret et.',           x:1300,y:1340,requires:'villager-friend',  secret:false},
+
+            /* — MARKET GENİŞLEME DALI (x:660-900, y:920+) — */
+            {id:'item-frame',       name:'Koleksiyoncu',     icon:'🖼️',tip:'Normal',   desc:'5 farklı kategoride market alışı yap.',   x:660, y:920, requires:'firin-ustasi',    secret:false},
+            {id:'emerald-block',    name:'Zümrüt Bloğu',     icon:'🟩',tip:'Efsanevi', desc:'Cüzdanda aynı anda 5000 XP biriktir.',   x:660, y:1140,requires:'trade-center',    secret:false},
+            {id:'dye-crafter',      name:'Boya Ustası',      icon:'🎨',tip:'Sistemsel',desc:'Tüm temaları en az 1 kez kullan.',        x:800, y:480, requires:'haritaci',        secret:false},
+
+            /* — DENEM E & NETHERİT DALI (x:220-440, y:1340+) — */
+            {id:'respawn-anchor',   name:'Yeniden Doğma',    icon:'⚓',tip:'Gizli',    desc:'Denemede 20 net artışı yakala.',          x:220, y:1340,requires:'diamond-ore',     secret:true },
+            {id:'netherite-upgrade',name:'Netherit Yükseltme',icon:'🪨',tip:'Zor',     desc:'3 denemede üst üste 80 net yap.',         x:80,  y:1560,requires:'diamond-ore',     secret:false},
+
+            /* — GİZLİ & BOSS (x:1500-1800, y:900+) — */
+            {id:'the-void',         name:'Hiçlik (The Void)',icon:'🌌',tip:'Gizli',    desc:'Plansız ekstra bir konu çalış.',          x:1500,y:920, requires:'redstone-eng',    secret:true },
+            {id:'warden-slayer',    name:'Warden Avcısı',    icon:'👹',tip:'Efsanevi', desc:'Tüm zor MEB konularını bitir.',           x:1960,y:920, requires:'dragon-breath',   secret:false},
+
+            /* ══ 3. BÖLÜM: 20 YENİ BAŞARIM ══ */
+            /* — ZAMAN & ODAK DALI (x:2200-2500, y:60-700) — */
+            {id:'campfire-rest',    name:'Kamp Ateşi',       icon:'🔥',tip:'Normal',   desc:'4 pomodoro + 1 uzun mola döngüsünü bitir.',  x:2200,y:60,  requires:'invis-potion',    secret:false},
+            {id:'clock-sync',       name:'Saat',             icon:'⏰',tip:'Zor',       desc:'3 gün üst üste zamanında çalışmaya başla.',  x:2200,y:260, requires:'villager-friend', secret:false},
+            {id:'spyglass-focus',   name:'Dürbün',           icon:'🔭',tip:'Zor',       desc:'Tek derste aralıksız 150 soru çöz.',         x:2200,y:480, requires:'mining-fatigue',  secret:false},
+            {id:'glowstone-night',  name:'Işıktaşı',         icon:'💡',tip:'Gizli',     desc:'Gece yarısı 00:00-02:00 arası 50 netli deneme.', x:2200,y:700,requires:'phantom-hunter', secret:true },
+
+            /* — GELİŞİM & ANALİZ DALI (x:2500-2800, y:60-700) — */
+            {id:'slimeball-stuck',  name:'Balçık Topu',      icon:'🟩',tip:'Başlangıç', desc:'Zor bir soruyu "Sorulacaklar" listesine ekle.', x:2500,y:60,  requires:'crafting-table',  secret:false},
+            {id:'observer-stats',   name:'Gözlemci',         icon:'👁️',tip:'Normal',   desc:'Hatalarını incelemek için 10 dk analiz yap.',  x:2500,y:260, requires:'slimeball-stuck',  secret:false},
+            {id:'golden-apple',     name:'Altın Elma',       icon:'🍎',tip:'Zor',       desc:'3 yanlış sonrası toparlanıp 5 ardışık doğru.', x:2500,y:480, requires:'respawn-anchor',   secret:false},
+            {id:'enchanted-apple',  name:'Büyülü Altın Elma',icon:'🌟',tip:'Efsanevi',  desc:'Tek günde 500 soru barajını aş.',             x:2500,y:700, requires:'golden-apple',     secret:false},
+            {id:'shield-defense',   name:'Kalkan',           icon:'🛡️',tip:'Zor',      desc:'En çok yanlış yaptığın derste yarıya indir.', x:2500,y:920, requires:'enchanted-apple',  secret:false},
+            {id:'anvil-repair',     name:'Örs',              icon:'🗜️',tip:'Zor',       desc:'Sadece Zor sorulardan 5 farklı test bitir.',  x:2500,y:1140,requires:'shield-defense',   secret:false},
+
+            /* — EKİPMAN & SİSTEM DALI (x:2200-2500, y:920-1560) — */
+            {id:'compass-nav',      name:'Pusula',           icon:'🧭',tip:'Sistemsel', desc:'Haftalık programını ilk kez eksiksiz oluştur.',x:2200,y:920, requires:'redstone-eng',    secret:false},
+            {id:'shulker-box',      name:'Shulker Kutusu',   icon:'🧰',tip:'Normal',    desc:'Dijital çantana 50 farklı soru kaydet.',      x:2200,y:1140,requires:'compass-nav',       secret:false},
+            {id:'note-block',       name:'Nota Bloğu',       icon:'🎵',tip:'Sistemsel', desc:'Odak müziğini 10 kez aktifleştir.',           x:2200,y:1340,requires:'campfire-rest',     secret:false},
+            {id:'command-block',    name:'Komut Bloğu',      icon:'⚙️',tip:'Sistemsel', desc:'Ayarlar menüsünde 3 farklı değişiklik yap.',  x:2200,y:1560,requires:'dye-crafter',       secret:false},
+            {id:'jukebox-party',    name:'Müzik Kutusu',     icon:'📻',tip:'Normal',    desc:'Haftalık hedeflerin %100\'ünü tamamla.',      x:2500,y:1340,requires:'redstone-eng',       secret:false},
+
+            /* — BOSS & FİNAL DALI (x:2700-3000, y:1000-1800) — */
+            {id:'bookshelf-meb',    name:'Kitaplık',         icon:'📚',tip:'Efsanevi',  desc:'MEB örnek sorularının yarısını bitir.',       x:2800,y:920, requires:'dragon-breath',    secret:false},
+            {id:'ender-pearl',      name:'Ender İncisi',     icon:'🔮',tip:'Efsanevi',  desc:'Hızda 10 soruyu toplam 5 dakikada bitir.',    x:2800,y:1140,requires:'speedrunner',       secret:false},
+            {id:'chorus-fruit',     name:'Koro Meyvesi',     icon:'🌺',tip:'Gizli',     desc:'En az sevdiğin branştan 2 ekstra test.',      x:2800,y:1340,requires:'brewing-science',   secret:true },
+            {id:'trident-loyalty',  name:'Sadakat Mızrağı',  icon:'🔱',tip:'Efsanevi',  desc:'60 gün boyunca her gün sisteme giriş yap.',  x:2800,y:1560,requires:'unbreaking-3',      secret:false},
+            {id:'nether-star',      name:'Nether Yıldızı',   icon:'⭐',tip:'Final',      desc:'Türkiye Geneli LGS denemesini sisteme gir.',  x:2800,y:1800,requires:'trident-loyalty',   secret:true },
+        ];
+
+        const ACH_MAP = {};
+        ACH_DATA.forEach(a=>ACH_MAP[a.id]=a);
+
+        const BADGE_CLASS = {
+            'Başlangıç':'badge-normal','Normal':'badge-normal','Zor':'badge-zor',
+            'Efsanevi':'badge-efsanevi','Gizli':'badge-gizli','Sistemsel':'badge-sistemsel','Final':'badge-final'
+        };
+
+        function getRank(n) {
+            if(n>=60)  return 'LGS Sona Erdi 🌌';
+            if(n>=50)  return 'Nether Yıldızı ⭐';
+            if(n>=40)  return 'End King 👑';
+            if(n>=30)  return 'Nether İmparatoru 🌀';
+            if(n>=20)  return 'Elmas Lord 💎';
+            if(n>=12)  return 'Demir Savaşçı 🛡️';
+            if(n>=6)   return 'Taş Ustası ⛏️';
+            if(n>=1)   return 'Acemi Madenci 🪓';
+            return 'Sıradan Köylü 🌾';
+        }
+
+        /* ── HARİTA RENDER ────────────────────────────────── */
+        function renderMap() {
+            const canvas=document.getElementById('map-canvas');
+            const svg=document.getElementById('connectors-svg');
+            const ach=appData.achievements;
+            canvas.querySelectorAll('.ach-node,.map-zone-label').forEach(n=>n.remove());
+            svg.innerHTML='';
+
+            /* SVG bağlantılar */
+            ACH_DATA.forEach(a=>{
+                if(!a.requires) return;
+                const parent=ACH_MAP[a.requires]; if(!parent) return;
+                const bothOpen=ach[a.id]&&ach[parent.id];
+                const d=`M ${parent.x+45} ${parent.y+34} L ${parent.x+45} ${a.y+34} L ${a.x+45} ${a.y+34}`;
+                const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+                path.setAttribute('d',d);
+                path.setAttribute('class',bothOpen?'conn-unlocked':'conn-locked');
+                svg.appendChild(path);
+            });
+
+            /* Düğümler */
+            let openCount=0;
+            ACH_DATA.forEach(a=>{
+                const isOpen=!!ach[a.id];
+                const isHidden=a.secret&&!isOpen;
+                const isFinal=a.tip==='Final';
+                if(isOpen) openCount++;
+
+                const node=document.createElement('div');
+                let cls='ach-node ';
+                cls+=isOpen?'unlocked ':'locked ';
+                if(isOpen&&a.secret&&!isFinal) cls+='secret ';
+                if(isOpen&&isFinal)            cls+='final ';
+                if(isHidden)                   cls+='hidden-locked ';
+                node.className=cls.trim();
+                node.style.left=a.x+'px'; node.style.top=a.y+'px';
+                node.innerHTML=`<div class="ach-box">${isHidden?'❓':a.icon}</div><div class="ach-name">${isHidden?'???':a.name}</div><div class="ach-badge ${BADGE_CLASS[a.tip]||'badge-normal'}">${isHidden?'???':a.tip}</div>`;
+                node.addEventListener('mouseenter',e=>showTooltip(e,a,isOpen,isHidden));
+                node.addEventListener('mousemove',e=>moveTooltip(e));
+                node.addEventListener('mouseleave',hideTooltip);
+                canvas.appendChild(node);
+            });
+
+            /* Zone etiketleri */
+            [{text:'SAVAŞ & DENEME',x:20,y:200},{text:'HIZ KOLU',x:300,y:640},{text:'MARKET & EĞLENCE',x:580,y:200},{text:'SİSTEM & PLAN',x:900,y:200},{text:'BOSS ZİNCİRİ',x:1240,y:200},{text:'DERS DALLARI',x:1640,y:200},{text:'GECE & SABAH',x:1080,y:1080},{text:'DENEME & NETHERİT',x:20,y:1500},{text:'ZAMAN & ODAK',x:2140,y:20},{text:'GELİŞİM & ANALİZ',x:2440,y:20},{text:'EKİPMAN & SİSTEM',x:2140,y:860},{text:'BOSS & FİNAL',x:2740,y:860}].forEach(z=>{
+                const el=document.createElement('div'); el.className='map-zone-label'; el.style.cssText=`left:${z.x}px;top:${z.y}px`; el.textContent=z.text; canvas.appendChild(el);
+            });
+
+            /* Alt bar */
+            const pct=Math.round((openCount/60)*100);
+            document.getElementById('mc-rank-text').textContent=`Rütbe: ${getRank(openCount)}`;
+            document.getElementById('mc-open-count').textContent=openCount;
+            document.getElementById('rank-progress-fill').style.width=pct+'%';
+        }
+
+        /* ── TOOLTIP ──────────────────────────────────────── */
+        function showTooltip(e,a,isOpen,isHidden) {
+            const t=document.getElementById('mc-tooltip');
+            document.getElementById('tooltip-icon').textContent=isHidden?'❓':a.icon;
+            const titleEl=document.getElementById('tooltip-title');
+            titleEl.textContent=isHidden?'Gizli Başarım':a.name;
+            titleEl.style.color=isOpen?(a.tip==='Final'?'var(--mc-purple)':a.secret?'var(--mc-gold)':'var(--mc-green)'):'#aaa';
+            document.getElementById('tooltip-desc').textContent=isHidden?'Daha fazla ilerle...':a.desc;
+            const st=document.getElementById('tooltip-status');
+            if(isHidden||!isOpen){st.textContent='🔒 Kilitli';st.className='tooltip-status ts-locked';}
+            else if(a.tip==='Final'){st.textContent='✨ AÇIK — Final';st.className='tooltip-status ts-final';}
+            else if(a.secret){st.textContent='✨ AÇIK — Gizli';st.className='tooltip-status ts-secret';}
+            else{st.textContent='✅ AÇIK';st.className='tooltip-status ts-open';}
+            t.classList.add('show'); moveTooltip(e);
+        }
+        function moveTooltip(e) {
+            const t=document.getElementById('mc-tooltip');
+            let lx=e.clientX+18,ly=e.clientY+14;
+            if(lx+270>window.innerWidth) lx=e.clientX-278;
+            if(ly+150>window.innerHeight) ly=e.clientY-158;
+            t.style.left=lx+'px'; t.style.top=ly+'px';
+        }
+        function hideTooltip(){document.getElementById('mc-tooltip').classList.remove('show');}
+
+        /* ── DRAG GEZİNME ─────────────────────────────────── */
+        (function(){
+            const vp=document.getElementById('map-viewport');
+            let drag=false,sx,sy,sl,st;
+            vp.addEventListener('mousedown',e=>{if(e.target.closest('.ach-node'))return;drag=true;sx=e.pageX-vp.offsetLeft;sy=e.pageY-vp.offsetTop;sl=vp.scrollLeft;st=vp.scrollTop;});
+            vp.addEventListener('mouseleave',()=>drag=false);
+            vp.addEventListener('mouseup',()=>drag=false);
+            vp.addEventListener('mousemove',e=>{if(!drag)return;e.preventDefault();vp.scrollLeft=sl-(e.pageX-vp.offsetLeft-sx);vp.scrollTop=st-(e.pageY-vp.offsetTop-sy);});
+        })();
+
+        function centerOnRoot() {
+            const vp=document.getElementById('map-viewport');
+            const root=ACH_MAP['crafting-table'];
+            vp.scrollLeft=root.x+45-vp.clientWidth/2;
+            vp.scrollTop=Math.max(0,root.y-80);
+        }
+
+        /* ── BAŞLANGIÇ ────────────────────────────────────── */
+        applyTheme(); updateHeader(); renderMap();
+        requestAnimationFrame(centerOnRoot);
+
+        /* Sayfa ziyareti kaydet */
+        registerPage('achievements');
+
+        /* world-traveler: Bu sayfa her açılışta +1 sayılır */
+        appData.achievementOpenCount = (appData.achievementOpenCount||0) + 1;
+        if (appData.achievementOpenCount >= 50) {
+            checkAndUnlock('world-traveler');
+        }
+        saveData(appData);
+    </script>
+</body>
+</html>
