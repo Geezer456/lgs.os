@@ -80,7 +80,9 @@
         table { width: 100%; border-collapse: separate; border-spacing: 2px; table-layout: fixed; }
         th, td { border: 1px solid #333; padding: 8px 4px; text-align: center; font-size: 11px; }
         th { background: #1a1a1a; color: var(--primary); }
-        .daily-todo { background: var(--card); border: 2px solid #222; padding: 15px; min-height: 300px; }
+        /* SOLDAKİ GÜNLÜK LİSTEYİ UZATMAK İÇİN */
+        .daily-todo { background: var(--card); border: 2px solid #222; padding: 15px; min-height: 450px; }
+        /* SOLDAKİ GÜNLÜK LİSTEYİ UZATMAK İÇİN */
         .right-panel { flex: 1; display: flex; flex-direction: column; gap: 15px; }
         .top-row { display: flex; gap: 12px; height: 210px; }
         .container {
@@ -93,8 +95,36 @@
         .market-item { background: #000; border: 1px solid var(--primary); padding: 6px 2px; text-align: center; cursor: pointer; min-height: 45px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
         .market-item:hover { background: var(--primary); color: #000; box-shadow: 0 0 10px var(--primary); }
         .timer-box { flex: 0.7; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        .spotify-neon-btn {
+            background: transparent !important;
+            border: 2px solid #1DB954 !important; /* Spotify Yeşili Border */
+            color: #1DB954 !important;
+            padding: 12px 25px !important;
+            font-size: 12px !important;
+            font-weight: bold !important;
+            letter-spacing: 2px !important;
+            text-transform: uppercase !important;
+            border-radius: 50px !important; /* Elips şeklinde */
+            cursor: pointer !important;
+            transition: all 0.4s ease !important;
+            box-shadow: 0 0 10px rgba(29, 185, 84, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+}
+
+        .spotify-neon-btn:hover {
+            background: var(--primary) !important;
+            color: #000 !important;
+            box-shadow: 0 0 20px #1DB954, 0 0 40px rgba(29, 185, 84, 0.4) !important;
+            transform: scale(1.05);
+}
+
+/* Eğer butonu turuncu temaya uydurmak istersen #1DB954 yerine var(--primary) yazabilirsin */
         #timer-display { font-size: 44px; color: var(--primary); font-family: monospace; margin: 5px 0; text-shadow: 0 0 15px var(--primary-glow); }
-        .tasks-box { flex: 1; min-height: 200px; }
+        /* SAĞDAKİ AKTİF GÖREVLER UZATMAK İÇİN */
+        .tasks-box { flex: 1; min-height: 300px; }
+        /* SAĞDAKİ AKTİF GÖREVLER UZATMAK İÇİN */
         input[type="text"], input[type="number"], select { background: #000; border: 1px solid #333; color: #fff; padding: 6px; font-size: 11px; }
         .boss-btn { border-color: var(--danger); color: var(--danger); }
         .boss-btn:hover { background: var(--danger); color: #fff; box-shadow: 0 0 10px var(--danger); }
@@ -144,10 +174,10 @@
         <div style="display:flex; align-items:center; gap:15px;">
             <div class="logo">⚡ LGS.OS</div>
             <a class="nav-link" href="index.html">🏠 ANA SAYFA</a>
-            <button onclick="cycleTheme()">TEMA</button>
             <a class="nav-link" href="meb.html">📚 MEB KONU</a>
             <a class="nav-link" href="deneme.html">📊 DENEME</a>
             <a class="nav-link" href="hiz.html">⚡ HIZ MODU</a>
+            <button onclick="cycleTheme()">TEMA</button>
         </div>
         <div style="display:flex; align-items:center; gap:15px;">
             <a class="nav-link achievements-link" href="achievements.html">🏆 BAŞARIMLAR</a>
@@ -237,9 +267,26 @@
                     </div>
                 </div>
 
-                <div style="width: 400px; height: 152px; border-radius: 12px; overflow: hidden; border: 1px solid var(--primary); background: #000; flex-shrink: 0;">
-                    <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/playlist/2QS9hqTfMAtY5oNUy3vQCo?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <div style="width: 300px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                    <button onclick="openSpotifyPopUp()" class="spotify-neon-btn">
+                        <i class="fab fa-spotify"></i> SPOTIFY PLAYER'I BAŞLAT
+                    </button>
+                    <span style="font-size: 9px; color: #555; letter-spacing: 1px;">KESİNTİSİZ MÜZİK İÇİN TIKLA</span>
                 </div>
+
+                <script>
+                function openSpotifyPopUp() {
+                    // Buradaki linki kendi Spotify çalma listenin embed linkiyle değiştirebilirsin
+                    const spotifyUrl = "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M"; 
+                    const width = 400;
+                    const height = 500;
+                    const left = (screen.width / 2) - (width / 2);
+                    const top = (screen.height / 2) - (height / 2);
+    
+                    window.open(spotifyUrl, "SpotifyPlayer", 
+                        `width=${width},height=${height},top=${top},left=${left},scrollbars=no,resizable=no`);
+                }
+                </script>
             </div>
         </div>
     </div>
