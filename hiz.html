@@ -219,7 +219,7 @@
         const STORAGE_KEY = 'LGS_GAMER_OS_DATA';
         function loadData() {
             try { const r=localStorage.getItem(STORAGE_KEY); if(r) return JSON.parse(r); } catch(e) {}
-            return { xpTotal:0,xpBalance:0,themeIdx:0,tasks:[],todos:[],planData:{},mebData:{},denemeler:[],hizHistory:[],hizSorular:Array(40).fill('bos'),achievements:{},visitedPages:[],achievementOpenCount:0,marketStats:{drinkCount:0,totalSpent:0},bossCompleted:0,focusMinutes:0,completedTaskCount:0 };
+            return { xpTotal:0,xpBalance:0,themeIdx:0,tasks:[],todos:[],planData:{},mebData:{},denemeler:[],hizHistory:[],hizSorular:Array(40).fill('dogry'),achievements:{},visitedPages:[],achievementOpenCount:0,marketStats:{drinkCount:0,totalSpent:0},bossCompleted:0,focusMinutes:0,completedTaskCount:0 };
         }
         function saveData(d) { localStorage.setItem(STORAGE_KEY,JSON.stringify(d)); }
         let appData = loadData();
@@ -280,7 +280,7 @@
             hizTimeLeft=parseInt(document.getElementById('hiz-dk').value)*60;
             updateTimerUI();
             const soruSayisi=parseInt(document.getElementById('hiz-soru').value);
-            if(appData.hizSorular.length!==soruSayisi){appData.hizSorular=Array(soruSayisi).fill('bos');saveData(appData);}
+            if(appData.hizSorular.length!==soruSayisi){appData.hizSorular=Array(soruSayisi).fill('dogru');saveData(appData);}
             renderSoruGrid(); hideSonucPanel();
         }
 
@@ -304,7 +304,7 @@
         function resetHizMod() {
             pauseHizMod(); oturumBaslangic=null;
             hizTimeLeft=parseInt(document.getElementById('hiz-dk').value)*60;
-            appData.hizSorular=Array(parseInt(document.getElementById('hiz-soru').value)).fill('bos');
+            appData.hizSorular=Array(parseInt(document.getElementById('hiz-soru').value)).fill('dogru');
             saveData(appData); updateTimerUI(); renderSoruGrid(); hideSonucPanel();
             document.getElementById('hiz-speed-display').textContent='— soru/dk';
             document.getElementById('hiz-speed-display').classList.remove('active');
@@ -385,12 +385,12 @@
 
         function renderSoruGrid() {
             const soruSayisi=parseInt(document.getElementById('hiz-soru').value);
-            if(appData.hizSorular.length!==soruSayisi) appData.hizSorular=Array(soruSayisi).fill('bos');
+            if(appData.hizSorular.length!==soruSayisi) appData.hizSorular=Array(soruSayisi).fill('dogru');
             document.getElementById('soru-count').textContent=soruSayisi+' Soru';
             const grid=document.getElementById('soru-grid'); grid.innerHTML='';
             for(let i=0;i<soruSayisi;i++){
                 const b=document.createElement('div');
-                b.id=`soru-${i}`; b.className=`soru-box ${appData.hizSorular[i]||'bos'}`;
+                b.id=`soru-${i}`; b.className=`soru-box ${appData.hizSorular[i]||'dogru'}`;
                 b.textContent=i+1; b.onclick=()=>toggleSoruDurum(i);
                 grid.appendChild(b);
             }
