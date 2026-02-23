@@ -219,14 +219,14 @@
         const STORAGE_KEY = 'LGS_GAMER_OS_DATA';
         function loadData() {
             try { const r=localStorage.getItem(STORAGE_KEY); if(r) return JSON.parse(r); } catch(e) {}
-            return { xpTotal:0,xpBalance:0,themeIdx:0,tasks:[],todos:[],planData:{},mebData:{},denemeler:[],hizHistory:[],hizSorular:Array(40).fill('dogry'),achievements:{},visitedPages:[],achievementOpenCount:0,marketStats:{drinkCount:0,totalSpent:0},bossCompleted:0,focusMinutes:0,completedTaskCount:0 };
+            return { xpTotal:0,xpBalance:0,themeIdx:0,tasks:[],todos:[],planData:{},mebData:{},denemeler:[],hizHistory:[],hizSorular:Array(40).fill('dogru'),achievements:{},visitedPages:[],achievementOpenCount:0,marketStats:{drinkCount:0,totalSpent:0},bossCompleted:0,focusMinutes:0,completedTaskCount:0 };
         }
         function saveData(d) { localStorage.setItem(STORAGE_KEY,JSON.stringify(d)); }
         let appData = loadData();
         if (!appData.achievements) appData.achievements = {};
         if (!appData.visitedPages) appData.visitedPages = [];
         if (!appData.hizHistory)   appData.hizHistory = [];
-        if (!appData.hizSorular)   appData.hizSorular = Array(40).fill('bos');
+        if (!appData.hizSorular)   appData.hizSorular = Array(40).fill('dogru');
 
         /* ── ACHIEVEMENT ENGINE ───────────────────────────── */
         const ACH_XP = {'crafting-table':10,'stone-age':20,'iron-armor':30,'diamond-ore':50,'enchanting':75,'dragon-breath':100,'speedrunner':40,'invis-potion':60,'firin-ustasi':15,'potion-master':35,'trade-center':50,'haritaci':25,'redstone-eng':30,'beacon-light':80,'villager-friend':25,'world-traveler':20,'monster-hunter':20,'wither-slayer':60,'hardcore-mode':90,'lgs-slayer':200,'redstone-math':40,'enchant-translator':45,'brewing-science':25,'ancient-history':80,'wandering-english':20,'totem-religion':40,'speed-potion-2':15,'mending-book':35,'phantom-hunter':50,'sunrise-clock':20,'mining-fatigue':70,'respawn-anchor':45,'emerald-block':90,'item-frame':20,'dye-crafter':25,'unbreaking-3':100,'the-void':30,'netherite-upgrade':60,'warden-slayer':85,'elytra-flight':50,'campfire-rest':25,'clock-sync':40,'spyglass-focus':45,'glowstone-night':55,'slimeball-stuck':10,'observer-stats':20,'golden-apple':40,'enchanted-apple':100,'shield-defense':35,'anvil-repair':40,'compass-nav':25,'shulker-box':20,'note-block':15,'command-block':15,'jukebox-party':30,'bookshelf-meb':90,'ender-pearl':70,'chorus-fruit':35,'trident-loyalty':120,'nether-star':150};
