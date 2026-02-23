@@ -375,7 +375,7 @@
         }
 
         function toggleSoruDurum(idx) {
-            const d=['bos','dogru','yanlis'];
+            const d=['dogru','yanlis','bos'];
             appData.hizSorular[idx]=d[(d.indexOf(appData.hizSorular[idx])+1)%3];
             saveData(appData);
             updateSoruBox(idx,appData.hizSorular[idx]);
