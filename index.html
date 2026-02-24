@@ -219,7 +219,7 @@
                             <span>📦 DEPOMU AÇ</span>
                         </div>
                         <div class="market-item" onclick="buy(50,'drink')"><span>☕ NESCAFE (50)</span></div>
-                        <div class="market-item" onclick="buy(300,'food')"><span>🎮 GAME +20DK (300)</span></div>
+                        <div class="market-item" onclick="buy(300,'game')"><span>🎮 GAME +20DK (300)</span></div>
                         <div class="market-item" onclick="buy(200,'food')"><span>🎞 YOUTUBE +20DK (200)</span></div>
                         <!-- Yemek: firin-ustasi tetikler -->
                         <div class="market-item" onclick="buy(600,'food')"><span>💲 +100TL  (600)</span></div>
@@ -321,7 +321,7 @@
 function updatePopupCounts() {
     if (!appData.inventory) appData.inventory = {};
     
-    const categories = ['drink', 'food', 'energy', 'book']; 
+    const categories = ['drink', 'food', 'energy', 'book', 'yotub', 'game']; 
     categories.forEach(cat => {
         const el = document.getElementById('popup-count-' + cat);
         if (el) el.innerText = appData.inventory[cat] || 0;
@@ -792,6 +792,18 @@ function updatePopupCounts() {
                 <div style="font-size: 30px;">🍔</div>
                 <div style="font-size: 10px;">KAHVE</div>
                 <div id="popup-count-food" style="font-weight: bold; color: #00ff00;">0</div>
+            </div>
+
+            <div onclick="useItem('yotub')" style="text-align: center; cursor: pointer; background: #333; padding: 10px; border-radius: 10px; width: 80px;">
+                <div style="font-size: 30px;">🎞</div>
+                <div style="font-size: 10px;">YOUTUBE</div>
+                <div id="popup-count-yotub" style="font-weight: bold; color: #00ff00;">0</div>
+            </div>
+
+            <div onclick="useItem('game')" style="text-align: center; cursor: pointer; background: #333; padding: 10px; border-radius: 10px; width: 80px;">
+                <div style="font-size: 30px;">🎮</div>
+                <div style="font-size: 10px;">GAME</div>
+                <div id="popup-count-game" style="font-weight: bold; color: #00ff00;">0</div>
             </div>
         </div>
 
