@@ -299,6 +299,36 @@
         const STORAGE_KEY = 'LGS_GAMER_OS_DATA';
 
         function toggleDepo() {
+    const p = document.getElementById('depo-popup');
+    const o = document.getElementById('depo-overlay');
+    
+    // Popup şu an gizli mi?
+    const isHidden = p.style.display === 'none' || p.style.display === '';
+
+    if (isHidden) {
+        // AÇILIRKEN: Önce sayıları bi' güncelle ki eski rakam kalmasın
+        updatePopupCounts(); 
+        p.style.display = 'block';
+        o.style.display = 'block';
+    } else {
+        // KAPATIRKEN:
+        p.style.display = 'none';
+        o.style.display = 'none';
+    }
+}
+
+// Bunu da altına ekle ki "updatePopupCounts is not defined" hatası da gitsin
+function updatePopupCounts() {
+    if (!appData.inventory) appData.inventory = {};
+    
+    const categories = ['drink', 'food', 'energy', 'book']; 
+    categories.forEach(cat => {
+        const el = document.getElementById('popup-count-' + cat);
+        if (el) el.innerText = appData.inventory[cat] || 0;
+    });
+}
+
+        function toggleDepo() {
             const popup = document.getElementById('depo-popup');
             const overlay = document.getElementById('depo-overlay');
     
