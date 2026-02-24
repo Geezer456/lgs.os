@@ -223,7 +223,7 @@
                         <div class="market-item" onclick="buy(200,'food')"><span>🎞 YOUTUBE +20DK (200)</span></div>
                         <!-- Yemek: firin-ustasi tetikler -->
                         <div class="market-item" onclick="buy(600,'money')"><span>💲 +100TL  (600)</span></div>
-                        <div class="market-item" onclick="buy(200,'food')"><span>🍫 ATIŞTIRMALIK (200)</span></div>
+                        <div class="market-item" onclick="buy(200,'cikolata')"><span>🍫 ATIŞTIRMALIK (200)</span></div>
                     </div>
                 </div>
                 <div class="container timer-box">
@@ -321,7 +321,7 @@
 function updatePopupCounts() {
     if (!appData.inventory) appData.inventory = {};
     
-    const categories = ['drink', 'food', 'energy', 'book', 'yotub', 'game', 'money']; 
+    const categories = ['drink', 'food', 'energy', 'book', 'yotub', 'game', 'money', 'cikolata']; 
     categories.forEach(cat => {
         const el = document.getElementById('popup-count-' + cat);
         if (el) el.innerText = appData.inventory[cat] || 0;
@@ -776,37 +776,37 @@ function updatePopupCounts() {
         <hr style="border: 1px solid var(--primary);">
     
         <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 20px 0;">
-            <div onclick="useItem('drink')" style="text-align: center; cursor: pointer; background: #333; padding: 10px;border-color: var(--primary-glow); border-radius: 10px; width: 80px;">
+            <div onclick="useItem('drink')" style="text-align: center; cursor: pointer; background: #333 !important; padding: 10px;border-color: var(--primary-glow); border-radius: 10px; width: 80px;">
                 <div style="font-size: 30px;">☕</div>
                 <div style="font-size: 10px;">NESCAFE</div>
                 <div id="popup-count-drink" style="font-weight: bold; color: #00ff00;">0</div>
             </div>
 
-            <div onclick="useItem('food')" style="text-align: center; cursor: pointer; background: #333; padding: 10px;border-color: var(--primary-glow); border-radius: 10px; width: 80px;">
+            <div onclick="useItem('cikolata')" style="text-align: center; cursor: pointer; background: #333 !important; padding: 10px;border-color: var(--primary-glow); border-radius: 10px; width: 80px;">
                 <div style="font-size: 30px;">🍫</div>
                 <div style="font-size: 10px;">ATIŞTIRMALIK</div>
-                <div id="popup-count-food" style="font-weight: bold; color: #00ff00;">0</div>
+                <div id="popup-count-cikolata" style="font-weight: bold; color: #00ff00;">0</div>
             </div>
         
-            <div onclick="useItem('food')" style="text-align: center; cursor: pointer; background: #333; padding: 10px;border-color: var(--primary-glow); border-radius: 10px; width: 80px;">
+            <div onclick="useItem('food')" style="text-align: center; cursor: pointer; background: #333 !important; padding: 10px;border-color: var(--primary-glow); border-radius: 10px; width: 80px;">
                 <div style="font-size: 30px;">🍔</div>
                 <div style="font-size: 10px;">KAHVE</div>
                 <div id="popup-count-food" style="font-weight: bold; color: #00ff00;">0</div>
             </div>
 
-            <div onclick="useItem('yotub')" style="text-align: center; cursor: pointer; background: #333; padding: 10px;border-color: var(--primary-glow); border-radius: 10px; width: 80px;">
+            <div onclick="useItem('yotub')" style="text-align: center; cursor: pointer; background: #333 !important; padding: 10px;border-color: var(--primary-glow); border-radius: 10px; width: 80px;">
                 <div style="font-size: 30px;">🎞</div>
                 <div style="font-size: 10px;">YOUTUBE</div>
                 <div id="popup-count-yotub" style="font-weight: bold; color: #00ff00;">0</div>
             </div>
 
-            <div onclick="useItem('game')" style="text-align: center; cursor: pointer; background: #333; padding: 10px;border-color: var(--primary-glow); border-radius: 10px; width: 80px;">
+            <div onclick="useItem('game')" style="text-align: center; cursor: pointer; background: #333 !important; padding: 10px;border-color: var(--primary-glow); border-radius: 10px; width: 80px;">
                 <div style="font-size: 30px;">🎮</div>
                 <div style="font-size: 10px;">GAME</div>
                 <div id="popup-count-game" style="font-weight: bold; color: #00ff00;">0</div>
             </div>
 
-            <div onclick="useItem('money')" style="text-align: center; cursor: pointer; background: #333; padding: 10px;border-color: var(--primary-glow); border-radius: 10px; width: 80px;">
+            <div onclick="useItem('money')" style="text-align: center; cursor: pointer; background: #333 !important; padding: 10px;border-color: var(--primary-glow); border-radius: 10px; width: 80px;">
                 <div style="font-size: 30px;">💲</div>
                 <div style="font-size: 10px;">100TL</div>
                 <div id="popup-count-money" style="font-weight: bold; color: #00ff00;">0</div>
