@@ -244,7 +244,7 @@
                     <div style="display:flex; gap:5px;">
                         <button onclick="resetDaily()" style="font-size:8px; border-color:#444; color:#444;">TEMİZLE</button>
                         <button onclick="killerMode()" style="font-size:8px; border-color:#444; color:#444;">💀 KILLER</button>
-                        <button onclick="toggleBackupPopup()" style="cursor: pointer; background: transparent; border: none; font-size: 20px;" title="Veri Yedekle/Yükle">💾</button>
+                        <button onclick="toggleBackupPopup()" style="cursor: pointer; background: transparent; border: none; font-size: 8px;" title="Veri Yedekle/Yükle">💾</button>
                     </div>
                 </div>
                 <div style="display:flex; gap:5px; margin-bottom:12px;">
@@ -767,16 +767,33 @@ function updatePopupCounts() {
 
             // 2. Yedekleme (Dışa Aktarma) Fonksiyonu
             function exportData() {
-               const data = localStorage.getItem('appData'); // Senin veriler
+                let allData = {};
+    
+                // Tarayıcının hafızasındaki TÜM verileri tek tek dolaş ve allData objesine at
+                for (let i = 0; i < localStorage.length; i++) {
+                    let key = localStorage.key(i);
+                    allData[key] = localStorage.getItem(key);
+                }
+
+                // Eğer hafıza tamamen boşsa (ki imkansız gibi bir şey senin projede)
+                if (Object.keys(allData).length === 0) {
+                    alert("Kanki ortada yedeklenecek hiçbir veri yok! Oyunda biraz takıl, sonra yedekle.");
+                    return;
+                }
+
+                // Verileri metne (JSON) çevir
+                const dataString = JSON.stringify(allData);
                 const textArea = document.getElementById('backup-text');
     
-                if (data) {
-                    textArea.value = data; // Kutuya veriyi yaz
-                    textArea.select(); // Yazıyı otomatik seç
-                    navigator.clipboard.writeText(data); // Panoya (Ctrl+C) otomatik kopyala
-                    alert("💾 Verilerin kutuya yazıldı ve OTOMATİK KOPYALANDI! Şimdi bu kodu güvenli bir yere kaydet.");
-                } else {
-                    alert("Kanki ortada yedeklenecek bir veri yok, daha oyuna yeni başlamışsın!");
+                textArea.value = dataString; // Kutuya veriyi yaz
+                textArea.select(); // Yazıyı otomatik seç
+    
+                // Kopyalama işlemi (Bazen tarayıcılar otomatik kopyalamaya izin vermez diye try-catch ekledik)
+                try {
+                    navigator.clipboard.writeText(dataString); 
+                    alert("💾 TÜM VERİLER (XP, Tema, Görevler, Depo vb.) kutuya yazıldı ve KOPYALANDI! Bu kodu kaybetme.");
+                } catch (err) {
+                    alert("💾 Veriler kutuya yazıldı! Ancak tarayıcın otomatik kopyalamayı engelledi. KUTUDAKİ YAZIYI KENDİN SAĞ TIK -> KOPYALA YAP kanki.");
                 }
             }
 
@@ -786,24 +803,30 @@ function updatePopupCounts() {
                 const newData = textArea.value.trim(); // Kutudaki yazıyı al
     
                 if (!newData) {
-                    alert("Kanki kutu boş, neyi yükleyeyim?");
+                    alert("Kanki kutu boş, kodu yapıştırmayı unuttun!");
                     return;
                 }
     
                 try {
-                    // Yapıştırılan kod gerçekten bizim veri formatında mı diye test ediyoruz
-                    JSON.parse(newData); 
+                    // Yapıştırılan kod düzgün mü diye test et
+                    const parsedData = JSON.parse(newData); 
         
-                    // Yanlışlıkla basmalara karşı son uyarı
-                    if (confirm("⚠️ DİKKAT! Mevcut verilerin tamamen silinecek ve yerine kutudaki veriler yüklenecek. Emin misin?")) {
-                        localStorage.setItem('appData', newData); // Veriyi ez ve yenisini yaz
-                        alert("✅ Veriler başarıyla yüklendi! Sistem yeniden başlatılıyor...");
+                    if (confirm("⚠️ DİKKAT! Mevcut tüm verilerin SİLİNECEK ve yerine kutudaki yedek yüklenecek. Emin misin?")) {
+                        // ÖNCEKİ BÜTÜN VERİLERİ TEMİZLE (Çakışma olmasın diye)
+                        localStorage.clear(); 
+            
+                        // YEDEKTEKİ VERİLERİ TEK TEK SİSTEME YÜKLE
+                        for (let key in parsedData) {
+                            localStorage.setItem(key, parsedData[key]);
+                        }
+            
+                        alert("✅ Tema, XP, Görevler... Her şey başarıyla yüklendi! Sistem yeniden başlatılıyor...");
                         location.reload(); // Değişikliklerin yansıması için sayfayı yenile
                     }
                 } catch (e) {
-                    // Eğer adam gidip oraya "selam naber" yazıp yükle derse çökmeyi engeller
-                       alert("❌ Kanki bu kod bozuk veya eksik! Eksik kopyalamadığına emin ol.");
-               }
+                    // Yanlış veya eksik kod yapıştırılırsa sistemi çökertmekten kurtarır
+                    alert("❌ Kanki bu kod bozuk! Kodu kopyalarken başından sonundan harf eksilttiysen çalışmaz.");
+                }
             }
 
         /* ── SUNRISE CLOCK: görev tamamlanınca kontrol ──────── */
