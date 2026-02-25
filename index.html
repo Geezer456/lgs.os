@@ -243,7 +243,8 @@
                     <h5 style="margin:0;">🎯 AKTİF GÖREVLER</h5>
                     <div style="display:flex; gap:5px;">
                         <button onclick="resetDaily()" style="font-size:8px; border-color:#444; color:#444;">TEMİZLE</button>
-                        <button onclick="killerMode()" class="boss-btn" style="font-size:8px;">💀 KILLER</button>
+                        <button onclick="killerMode()" style="font-size:8px; border-color:#444; color:#444;">💀 KILLER</button>
+                        <button onclick="toggleBackupPopup()" style="cursor: pointer; background: transparent; border: none; font-size: 20px;" title="Veri Yedekle/Yükle">💾</button>
                     </div>
                 </div>
                 <div style="display:flex; gap:5px; margin-bottom:12px;">
@@ -747,6 +748,64 @@ function updatePopupCounts() {
             if (ls.streak >= 60) checkAndUnlock('trident-loyalty');
         }
 
+                /*---Veri Yedekleme/Yükleme--- */
+        
+                // 1. Popup'ı Açıp Kapatan Fonksiyon
+            function toggleBackupPopup() {
+                const p = document.getElementById('backup-popup');
+                const o = document.getElementById('backup-overlay');
+                const isHidden = p.style.display === 'none' || p.style.display === '';
+    
+                p.style.display = isHidden ? 'block' : 'none';
+                o.style.display = isHidden ? 'block' : 'none';
+    
+                // Ekran açılırken içindeki eski yazıları temizle
+                if (isHidden) {
+                    document.getElementById('backup-text').value = '';
+                }
+            }    
+
+            // 2. Yedekleme (Dışa Aktarma) Fonksiyonu
+            function exportData() {
+               const data = localStorage.getItem('appData'); // Senin veriler
+                const textArea = document.getElementById('backup-text');
+    
+                if (data) {
+                    textArea.value = data; // Kutuya veriyi yaz
+                    textArea.select(); // Yazıyı otomatik seç
+                    navigator.clipboard.writeText(data); // Panoya (Ctrl+C) otomatik kopyala
+                    alert("💾 Verilerin kutuya yazıldı ve OTOMATİK KOPYALANDI! Şimdi bu kodu güvenli bir yere kaydet.");
+                } else {
+                    alert("Kanki ortada yedeklenecek bir veri yok, daha oyuna yeni başlamışsın!");
+                }
+            }
+
+            // 3. Yükleme (İçe Aktarma) Fonksiyonu
+            function importData() {
+                const textArea = document.getElementById('backup-text');
+                const newData = textArea.value.trim(); // Kutudaki yazıyı al
+    
+                if (!newData) {
+                    alert("Kanki kutu boş, neyi yükleyeyim?");
+                    return;
+                }
+    
+                try {
+                    // Yapıştırılan kod gerçekten bizim veri formatında mı diye test ediyoruz
+                    JSON.parse(newData); 
+        
+                    // Yanlışlıkla basmalara karşı son uyarı
+                    if (confirm("⚠️ DİKKAT! Mevcut verilerin tamamen silinecek ve yerine kutudaki veriler yüklenecek. Emin misin?")) {
+                        localStorage.setItem('appData', newData); // Veriyi ez ve yenisini yaz
+                        alert("✅ Veriler başarıyla yüklendi! Sistem yeniden başlatılıyor...");
+                        location.reload(); // Değişikliklerin yansıması için sayfayı yenile
+                    }
+                } catch (e) {
+                    // Eğer adam gidip oraya "selam naber" yazıp yükle derse çökmeyi engeller
+                       alert("❌ Kanki bu kod bozuk veya eksik! Eksik kopyalamadığına emin ol.");
+               }
+            }
+
         /* ── SUNRISE CLOCK: görev tamamlanınca kontrol ──────── */
         function checkSunriseClock() {
             if (appData.loginStreak && appData.loginStreak.sunriseToday) {
@@ -817,6 +876,22 @@ function updatePopupCounts() {
     </div>
 
     <div id="depo-overlay" onclick="toggleDepo()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000;"></div>
+        <div id="backup-popup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 400px; background: #222; border: 3px solid #00aaff; border-radius: 20px; z-index: 10001; padding: 20px; color: white; box-shadow: 0 0 50px rgba(0,0,0,0.9); font-family: sans-serif; text-align: center;">
+            <h3 style="margin-top: 0;">💾 Veri Yönetimi</h3>
+            <hr style="border: 1px solid #00aaff; margin-bottom: 15px;">
+    
+            <p style="font-size: 13px; color: #ccc;"><b>Yedeklemek için:</b> 'YEDEKLE'ye bas, kodu kopyala.<br><b>Yüklemek için:</b> Kodu kutuya yapıştır, 'YÜKLE'ye bas.</p>
+    
+            <textarea id="backup-text" style="width: 90%; height: 100px; background: #111; color: #00ff00; border: 1px solid #555; border-radius: 5px; padding: 10px; margin-bottom: 15px; resize: none; font-family: monospace;" placeholder="Kodlar buraya gelecek..."></textarea>
+    
+            <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
+                <button onclick="exportData()" style="flex: 1; padding: 10px; background: #00aaff; border: none; color: white; border-radius: 5px; cursor: pointer; font-weight: bold;">📥 YEDEKLE</button>
+                <button onclick="importData()" style="flex: 1; padding: 10px; background: #ffaa00; border: none; color: white; border-radius: 5px; cursor: pointer; font-weight: bold;">📤 YÜKLE</button>
+            </div>
+    
+            <button onclick="toggleBackupPopup()" style="width: 100%; padding: 10px; background: #ff4444; border: none; color: white; border-radius: 5px; cursor: pointer; font-weight: bold;">KAPAT</button>
+        </div>
 
+        <div id="backup-overlay" onclick="toggleBackupPopup()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000;"></div>
 </body>
 </html>
