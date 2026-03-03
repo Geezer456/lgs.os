@@ -112,25 +112,27 @@
         </div>
     </header>
 
-    <div class="page-content">
-        <div class="page-header" style="display: flex; flex-direction: column; align-items: center; position: relative;">
-                <a href="https://krakademi.com/blog-detay/lgs-konu-dagilimi-ve-soru-dagilimi-1898" target="_blank" class="nav-link" 
-                   style="position: absolute; right: 0; top: 10px; border-color: var(--primary); color: var(--card); padding: 8px 15px; font-size: 11px;">
-                   🌐 LGS Soru Dağılımları Tablosu
-                </a>
-
-                <h2 class="page-title">📚 MEB KONU TAKİP</h2>
-                <p class="page-subtitle">Konu → Tekrar → Test → Deneme &nbsp;|&nbsp; Her tamamlanan konu: <span style="color:var(--primary);">+10 XP</span></p>
+    <div class="page-header" style="position: relative; margin-bottom: 25px;">
     
-                <div class="overall-progress-bar">
-                    <div class="overall-bar-row">
-                        <div style="font-size:10px;color:#666;white-space:nowrap;">GENEL İLERLEME</div>
-                        <div class="overall-bar-bg"><div id="overall-bar-fill"></div></div>
-                        <div class="overall-stats-text" id="overall-stats-text">0 / 0</div>
-                    </div>
+        <div style="position: absolute; right: 0; top: 0;">
+            <a href="https://krakademi.com/blog-detay/lgs-konu-dagilimi-ve-soru-dagilimi-1898" target="_blank" class="nav-link" 
+               style="border-color: var(--primary); color: var(--primary); padding: 8px 15px; font-size: 11px; box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);">
+               🌐 LGS Soru Dağılımları Tablosu
+            </a>
+        </div>
+
+        <h2 class="page-title">📚 MEB KONU TAKİP</h2>
+        <p class="page-subtitle">Konu → Tekrar → Test → Deneme &nbsp;|&nbsp; Her tamamlanan konu: <span style="color:var(--primary);">+10 XP</span></p>
+        
+        <div class="overall-progress-bar">
+            <div class="overall-bar-row">
+                <div style="font-size:10px;color:#666;white-space:nowrap;">GENEL İLERLEME</div>
+                <div class="overall-bar-bg">
+                    <div id="overall-bar-fill"></div>
                 </div>
-            </div>
-        <div class="meb-grid" id="meb-grid"></div>
+                <div class="overall-stats-text" id="overall-stats-text">0 / 0 Konu (%0)</div>
+             </div>
+        </div>
     </div>
 
     <div class="status-mini-bar">
