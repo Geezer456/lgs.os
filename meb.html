@@ -192,12 +192,12 @@
 
         /* ── DERS VERİSİ ──────────────────────────────────── */
         const dersler = [
-            {id:'turkce', ad:'TÜRKÇE',         icon:'📖', bg:'📖', konular:['Sözcükte Anlam','Cümlede Anlam','Paragrafta Anlam','Yazım Kuralları','Noktalama İşaretleri','Fiilimsiler','Anlatım Bozuklukları','Söz Sanatları']},
-            {id:'mat',    ad:'MATEMATİK',       icon:'📐', bg:'🔢', konular:['Çarpanlar ve Katlar','Üslü İfadeler','Kareköklü İfadeler','Cebirsel İfadeler','Denklemler','Eşitsizlikler','Oran-Orantı','Olasılık']},
-            {id:'fen',    ad:'FEN BİLİMLERİ',   icon:'🔬', bg:'⚗️', konular:['DNA ve Genetik','Hücre Bölünmesi','Basınç','Kuvvet ve Hareket','Enerji Dönüşümleri','Elektrik','Kimyasal Tepkimeler','Asit-Baz']},
-            {id:'ing',    ad:'İNGİLİZCE',       icon:'🌍', bg:'🗣️', konular:['Present Tense','Past Tense','Future Tense','Modals','Conditionals','Vocabulary','Reading','Listening']},
-            {id:'sosyal', ad:'SOSYAL BİLİMLER', icon:'🗺️', bg:'🏛️', konular:['Coğrafya-Bölgeler','Nüfus ve Yerleşme','Osmanlı Tarihi','Atatürk İlkeleri','İnsan Hakları','Ekonomi','Yönetim','Kültür']},
-            {id:'din',    ad:'DİN KÜLTÜRÜ',     icon:'☪️',  bg:'📿', konular:['İbadetler','Namaz','Oruç','Peygamberler','Kuran','Ahlak','Hz. Muhammed','İslam Tarihi']},
+            {id:'turkce', ad:'TÜRKÇE',         icon:'📖', bg:'📖', konular:['Filimsiler','Cümlenin Ögeleri','Fiilde Çatı','Sözcükte Anlam','Cümlede Anlam','Cümle Türleri','Yazım Kuralları','Paragraf','Noktalama İşaretleri','Anlatım Bozuklukları',]},
+            {id:'mat',    ad:'MATEMATİK',       icon:'📐', bg:'🔢', konular:['Çarpanlar Ve Katlar','Üslü İfadeler','Kareköklü İfadeler','Veri Analizi','Olasılık','Cebirsel İfadeler','Doğrusal Denklemler','Eşitsizlikler','Üçgenler','Eşlik Ve Benzerlik','Dönüşüm Geometrisi','Geometrik Cisimler',]},
+            {id:'fen',    ad:'FEN BİLİMLERİ',   icon:'🔬', bg:'⚗️', konular:['Mevsimler Ve İklim','DNA Ve Genetik Kod','Basınç','Madde Endüstrisi','Basit Makineler','Enerji Dönüşümleri Ve Çevre','Elektrik Yükleri Ve Enerjisi',]},
+            {id:'ing',    ad:'İNGİLİZCE',       icon:'🌍', bg:'🗣️', konular:['Friendship','Teen Life','İn The Kitchen','On The Phone','The İnternet','Adventures','Tourisim','Chores','Science','Natural Forces',]},
+            {id:'sosyal', ad:'SOSYAL BİLİMLER', icon:'🗺️', bg:'🏛️', konular:['Bir Kahraman Doğuyor','Milli Uyanış','Ya İstiklal Ya Ölüm','Atatürkçülük Ve Çağdaşlaşan Türkiye','Demokratikleşme Çabaları','Atatürk Dönemi Ve Türk Dış Politikası','Atatürk"ün Ölümü Ve Sonrası',]},
+            {id:'din',    ad:'DİN KÜLTÜRÜ',     icon:'☪️',  bg:'📿', konular:['Kader İnancı','Zekat Ve Sadaka','Din Ve Hayat','Hz. Muhammed"in Örnekliği','Kuran-ı Kerim Ve Özellikleri',]},
         ];
         const tickTypes  = ['konu','tekrar','test','deneme'];
         const tickLabels = {konu:'📝 Konu',tekrar:'🔄 Tekrar',test:'📋 Test',deneme:'📊 Deneme'};
@@ -281,12 +281,17 @@
             }
 
             /* warden-slayer: tüm 6 dersin son 2 konusu (idx 6,7 = genellikle en zor konular) tamamlandı mı? */
-            const zorKonuTam = dersler.every(ders=>
-                [6,7].every(idx=>{
-                    const k=appData.mebData[`${ders.id}-${idx}`];
-                    return k&&k.konu&&k.tekrar&&k.test&&k.deneme;
-                })
-            );
+            /* warden-slayer: tüm derslerin SON 2 konusu tamamlandı mı? (Dinamik hale getirildi) */
+            const zorKonuTam = dersler.every(ders => {
+                const sonIdx = ders.konular.length - 1;
+                const sondanBirOncekiIdx = ders.konular.length - 2;
+                
+                return [sondanBirOncekiIdx, sonIdx].every(idx => {
+                    if(idx < 0) return true; // Eğer derste 1 konu varsa hata vermesin diye
+                    const k = appData.mebData[`${ders.id}-${idx}`];
+                    return k && k.konu && k.tekrar && k.test && k.deneme;
+                });
+            });
             if (zorKonuTam) checkAndUnlock('warden-slayer');
 
             updateLGSMini();
