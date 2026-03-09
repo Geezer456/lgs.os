@@ -219,11 +219,11 @@
                             <span>📦 DEPOMU AÇ</span>
                         </div>
                         <div class="market-item" onclick="buy(50,'drink')"><span>☕ NESCAFE (50)</span></div>
-                        <div class="market-item" onclick="buy(300,'game')"><span>🎮 GAME +20DK (300)</span></div>
-                        <div class="market-item" onclick="buy(200,'food')"><span>🎞 YOUTUBE +20DK (200)</span></div>
+                        <div class="market-item" onclick="buy(150,'game')"><span>🎮 GAME +20DK (150)</span></div>
+                        <div class="market-item" onclick="buy(150,'food')"><span>🎞 YOUTUBE +20DK (150)</span></div>
                         <!-- Yemek: firin-ustasi tetikler -->
-                        <div class="market-item" onclick="buy(600,'money')"><span>💲 +100TL  (600)</span></div>
-                        <div class="market-item" onclick="buy(200,'cikolata')"><span>🍫 ATIŞTIRMALIK (200)</span></div>
+                        <div class="market-item" onclick="buy(800,'money')"><span>💲 +100TL  (800)</span></div>
+                        <div class="market-item" onclick="buy(100,'cikolata')"><span>🍫 ATIŞTIRMALIK (100)</span></div>
                     </div>
                 </div>
                 <div class="container timer-box">
@@ -550,7 +550,7 @@ function updatePopupCounts() {
 
         function completeTask(i) {
             const isBoss = appData.tasks[i].isBoss;
-            const gain   = isBoss ? 50 : 20;
+            const gain   = isBoss ? 60 : 30;
             appData.xpTotal   += gain;
             appData.xpBalance += gain;
             appData.tasks.splice(i, 1);
