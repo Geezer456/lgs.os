@@ -159,7 +159,7 @@
 
     <div class="page-content">
         <h2 class="page-title">⚡ HIZ MODU</h2>
-        <p class="page-subtitle">Challenge Modu — Süreyi seç, soruları işaretle, XP kazan &nbsp;·&nbsp; Her doğru: <span style="color:var(--primary);">+5 XP</span></p>
+        <p class="page-subtitle">Challenge Modu — Süreyi seç, soruları işaretle, XP kazan &nbsp;·&nbsp; Her doğru: <span style="color:var(--primary);">+3 XP</span></p>
 
         <div class="analiz-container">
             <div class="hiz-settings">
@@ -320,7 +320,7 @@
             const bos       = appData.hizSorular.filter(s=>s==='bos').length;
             const gecenDk   = oturumBaslangic ? Math.max(1,Math.round((Date.now()-oturumBaslangic.getTime())/60000)) : sure;
             const soruPerDk = gecenDk>0 ? (dogru/gecenDk).toFixed(1) : '0.0';
-            const kazanilanXP = dogru*5;
+            const kazanilanXP = dogru*3;
             appData.xpTotal+=kazanilanXP; appData.xpBalance+=kazanilanXP;
 
             appData.hizHistory.unshift({tarih:new Date().toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}),ders,sure,soru:soruSayisi,dogru,yanlis,bos,xp:kazanilanXP,soruPerDk:parseFloat(soruPerDk)});
