@@ -229,7 +229,7 @@
 
         /* ── HEADER ───────────────────────────────────────── */
         function updateHeader() {
-            const level=Math.floor(appData.xpTotal/100)+1;
+            const level=Math.floor(appData.xpTotal/500)+1;
             document.getElementById('level').innerText=level;
             document.getElementById('xp-balance').innerText=appData.xpBalance;
             document.getElementById('header-xp-bar').style.width=(appData.xpTotal%100)+'%';
