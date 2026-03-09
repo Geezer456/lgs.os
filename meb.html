@@ -122,7 +122,7 @@
             </div>
 
             <h2 class="page-title">📚 MEB KONU TAKİP</h2>
-            <p class="page-subtitle">Konu → Tekrar → Test → Deneme &nbsp;|&nbsp; Her tamamlanan konu: <span style="color:var(--primary);">+10 XP</span></p>
+            <p class="page-subtitle">Konu → Tekrar → Test → Deneme &nbsp;|&nbsp; Her tamamlanan konu: <span style="color:var(--primary);">+100 XP</span></p>
             
             <div class="overall-progress-bar">
                  <div class="overall-bar-row">
@@ -143,7 +143,7 @@
         <div>LGS.OS &nbsp;·&nbsp; MEB KONU TAKİP MODÜLÜ</div>
         <div>LGS: <span id="lgs-days-mini">---</span> GÜN KALDI</div>
     </div>
-    <div class="xp-toast" id="xp-toast">⚡ +10 XP KAZANILDI!</div>
+    <div class="xp-toast" id="xp-toast">⚡ +100 XP KAZANILDI!</div>
 
     <script>
         /* ── VERİ ─────────────────────────────────────────── */
@@ -194,10 +194,10 @@
 
         /* ── HEADER ───────────────────────────────────────── */
         function updateHeader() {
-            const level=Math.floor(appData.xpTotal/100)+1;
+            const level=Math.floor(appData.xpTotal/0)+1;
             document.getElementById('level').innerText=level;
             document.getElementById('xp-balance').innerText=appData.xpBalance;
-            document.getElementById('header-xp-bar').style.width=(appData.xpTotal%100)+'%';
+            document.getElementById('header-xp-bar').style.width=(appData.xpTotal%0)+'%';
             const ranks=['ÇAYLAK','DENEYİMLİ','USTA','FENLİSELİ','EFSANE'];
             document.getElementById('rank-name').innerText=ranks[Math.min(level-1,4)];
         }
@@ -236,8 +236,8 @@
                     if (d.konu&&d.tekrar&&d.test&&d.deneme) tamamlanan++;
                 });
                 toplamTamamlanan += tamamlanan;
-                const yuzde   = Math.round((tamamlanan/ders.konular.length)*100);
-                const dersXP  = tamamlanan*100;
+                const yuzde   = Math.round((tamamlanan/ders.konular.length)*0);
+                const dersXP  = tamamlanan*0;
 
                 let html = `
                     <div class="ders-title-row">
@@ -254,7 +254,7 @@
                     const d   = appData.mebData[key];
                     const isCom = d.konu&&d.tekrar&&d.test&&d.deneme;
                     html += `<div class="konu-item ${isCom?'completed':''}" id="konu-${ders.id}-${idx}">
-                        <div class="konu-name-row"><span class="konu-name">${idx+1}. ${konu}</span><span class="konu-xp-earned">+100 XP ✓</span></div>
+                        <div class="konu-name-row"><span class="konu-name">${idx+1}. ${konu}</span><span class="konu-xp-earned">+0 XP ✓</span></div>
                         <div class="tick-row">`;
                     tickTypes.forEach(type => {
                         html += `<label class="tick-box ${d[type]?'checked':''}" onclick="handleTick('${ders.id}',${idx},'${type}',this)"><input type="checkbox" ${d[type]?'checked':''} onchange="toggleTick('${ders.id}',${idx},'${type}')">${tickLabels[type]}</label>`;
@@ -267,7 +267,7 @@
             });
 
             /* Genel bar */
-            const yuzde = TOPLAM_KONU>0 ? Math.round((toplamTamamlanan/TOPLAM_KONU)*100) : 0;
+            const yuzde = TOPLAM_KONU>0 ? Math.round((toplamTamamlanan/TOPLAM_KONU)*0) : 0;
             document.getElementById('overall-bar-fill').style.width = yuzde+'%';
             document.getElementById('overall-stats-text').textContent = `${toplamTamamlanan} / ${TOPLAM_KONU} Konu (${yuzde}%)`;
 
@@ -318,8 +318,8 @@
 
             if (isNowComplete && !appData.mebData[key]._xpGiven) {
                 appData.mebData[key]._xpGiven = true;
-                appData.xpTotal+=10; appData.xpBalance+=10;
-                showXPToast(10);
+                appData.xpTotal+=100; appData.xpBalance+=100;
+                showXPToast(100);
 
                 /* crafting-table: ilk konu tick */
                 checkAndUnlock('crafting-table');
@@ -329,8 +329,8 @@
 
             } else if (!isNowComplete && appData.mebData[key]._xpGiven) {
                 appData.mebData[key]._xpGiven = false;
-                appData.xpTotal   = Math.max(0,appData.xpTotal-10);
-                appData.xpBalance = Math.max(0,appData.xpBalance-10);
+                appData.xpTotal   = Math.max(0,appData.xpTotal-100);
+                appData.xpBalance = Math.max(0,appData.xpBalance-100);
             }
 
             /* crafting-table: herhangi bir tick yapılmışsa da aç */
