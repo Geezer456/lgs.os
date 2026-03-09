@@ -154,7 +154,7 @@ const THEME=['','theme-cyan','theme-purple','theme-green'];
 function applyTheme(){document.body.className=THEME[appData.themeIdx]||'';}
 function cycleTheme(){appData.themeIdx=(appData.themeIdx+1)%THEME.length;saveData(appData);applyTheme();}
 function updateHeader(){
-    const lvl=Math.floor(appData.xpTotal/100)+1;
+    const lvl=Math.floor(appData.xpTotal/500)+1;
     document.getElementById('level').innerText=lvl;
     document.getElementById('xp-balance').innerText=appData.xpBalance;
     document.getElementById('header-xp-bar').style.width=(appData.xpTotal%100)+'%';
