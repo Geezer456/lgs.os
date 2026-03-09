@@ -237,7 +237,7 @@
                 });
                 toplamTamamlanan += tamamlanan;
                 const yuzde   = Math.round((tamamlanan/ders.konular.length)*100);
-                const dersXP  = tamamlanan*10;
+                const dersXP  = tamamlanan*100;
 
                 let html = `
                     <div class="ders-title-row">
@@ -254,7 +254,7 @@
                     const d   = appData.mebData[key];
                     const isCom = d.konu&&d.tekrar&&d.test&&d.deneme;
                     html += `<div class="konu-item ${isCom?'completed':''}" id="konu-${ders.id}-${idx}">
-                        <div class="konu-name-row"><span class="konu-name">${idx+1}. ${konu}</span><span class="konu-xp-earned">+10 XP ✓</span></div>
+                        <div class="konu-name-row"><span class="konu-name">${idx+1}. ${konu}</span><span class="konu-xp-earned">+100 XP ✓</span></div>
                         <div class="tick-row">`;
                     tickTypes.forEach(type => {
                         html += `<label class="tick-box ${d[type]?'checked':''}" onclick="handleTick('${ders.id}',${idx},'${type}',this)"><input type="checkbox" ${d[type]?'checked':''} onchange="toggleTick('${ders.id}',${idx},'${type}')">${tickLabels[type]}</label>`;
