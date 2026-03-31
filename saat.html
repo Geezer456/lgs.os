@@ -5,176 +5,113 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LGS.OS | Dinamik Saat</title>
     <style>
-        /* Temel Ayarlar */
         :root {
             --bg: #000;
             --text: #fff;
-            --accent: #333;
+            --accent: #ff8800; /* LGS.OS Ana Turuncusu */
         }
 
         body, html {
             margin: 0; padding: 0; height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             overflow: hidden;
             background-color: var(--bg);
             color: var(--text);
-            transition: background 0.5s ease, color 0.5s ease;
+            transition: all 0.5s ease;
         }
 
-        /* Ana Taşıyıcı: Her şeyi ortalar */
+        /* Ana Taşıyıcı */
         .wrapper {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100%;
-            position: relative;
-            z-index: 2;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            height: 100vh; width: 100%; position: relative; z-index: 2;
         }
 
         /* Saat Tasarımı */
         #clock {
-            font-size: clamp(5rem, 15vw, 12rem); /* Ekrana göre büyür/küçülür */
-            font-weight: 800;
-            margin: 0;
-            letter-spacing: -2px;
-            display: flex;
-            align-items: baseline;
+            font-size: clamp(5rem, 18vw, 15rem);
+            font-weight: 800; margin: 0;
+            display: flex; align-items: baseline;
+            text-shadow: 0 0 20px rgba(255,255,255,0.1);
         }
 
-        #seconds {
-            font-size: 0.4em; /* Saniye daha küçük görünsün */
-            margin-left: 10px;
-            opacity: 0.8;
-        }
-
+        #seconds { font-size: 0.4em; margin-left: 15px; opacity: 0.6; }
         .hidden { display: none !important; }
 
-        /* Buton Grubu */
-        .controls {
-            margin-top: 40px;
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
+        /* Butonlar */
+        .controls { margin-top: 50px; display: flex; gap: 15px; z-index: 10; }
+        
         button {
-            padding: 12px 24px;
-            background: transparent;
-            border: 2px solid var(--text);
-            color: var(--text);
-            cursor: pointer;
-            font-weight: bold;
-            text-transform: uppercase;
-            transition: 0.2s;
+            padding: 12px 25px; background: transparent;
+            border: 2px solid var(--text); color: var(--text);
+            cursor: pointer; font-weight: bold; border-radius: 12px;
+            transition: 0.3s; text-transform: uppercase;
         }
-
-        button:hover {
-            background: var(--text);
-            color: var(--bg);
-        }
+        button:hover { background: var(--text); color: var(--bg); }
 
         /* --- TEMALAR --- */
+        .theme-white { background-color: #ffffff !important; color: #000000 !important; }
+        .theme-white button { border-color: #000; color: #000; }
+        .theme-white button:hover { background: #000; color: #fff; }
 
-        /* Cyberpunk Modu */
-        .cyberpunk-theme {
-            background-color: #050505 !important;
-            color: #0ff !important;
-        }
-        .cyberpunk-theme #clock {
-            text-shadow: 4px 4px #f0f, -2px -2px #0ff;
-        }
-        .cyberpunk-theme button { border-color: #f0f; color: #f0f; }
+        .theme-black { background-color: #000000 !important; color: #ffffff !important; }
 
-        /* Minecraft Modu */
-        .minecraft-theme {
-            background-color: #5d81bf !important;
-            color: #fff !important;
-        }
-        .mc-world {
-            display: none;
-            position: absolute;
-            bottom: 0; width: 100%; height: 120px;
-            background: #4a752c; /* Çimen */
-            z-index: 1;
-        }
-        .minecraft-theme .mc-world { display: block; }
+        .theme-cyberpunk { background-color: #050505 !important; color: #0ff !important; }
+        .theme-cyberpunk #clock { text-shadow: 4px 4px #f0f, -2px -2px #0ff; }
+        .theme-cyberpunk button { border-color: #f0f; color: #f0f; }
+        .theme-cyberpunk button:hover { background: #f0f; color: #000; }
 
-        /* Basit MC Objeleri */
-        .creeper {
-            width: 40px; height: 70px; background: #51a03e;
-            position: absolute; left: 15%; bottom: 20px;
-            border: 4px solid #000;
-        }
-        .tree {
-            width: 30px; height: 90px; background: #6d4a2c;
-            position: absolute; right: 20%; bottom: 20px;
-        }
-        .tree::after {
-            content: ''; position: absolute; top: -40px; left: -25px;
-            width: 80px; height: 60px; background: #38761d;
-        }
+        .theme-minecraft { background-color: #5d81bf !important; color: #fff !important; }
+        .mc-world { display: none; position: absolute; bottom: 0; width: 100%; height: 100px; background: #4a752c; z-index: 1; }
+        .theme-minecraft .mc-world { display: block; }
 
-        /* Navigasyon (Geri Dönüş) */
+        /* Geri Dönüş */
         .nav-home {
             position: absolute; top: 20px; left: 20px;
-            text-decoration: none; color: inherit; font-size: 0.9rem;
-            border-bottom: 1px solid;
+            text-decoration: none; color: inherit; font-size: 14px;
+            font-weight: bold; border: 1px solid; padding: 8px 15px; border-radius: 10px;
         }
     </style>
 </head>
-<body class="default">
+<body>
 
-    <a href="index.html" class="nav-home">← LGS.OS ANA SAYFA</a>
+    <a href="index.html" class="nav-home">← ANA SAYFAYA DÖN</a>
 
-    <div class="wrapper" id="main-bg">
+    <div class="wrapper" id="main-layer">
         <div id="clock">00:00<span id="seconds" class="hidden">:00</span></div>
 
         <div class="controls">
-            <button onclick="toggleSec()">Saniyeyi Aç/Kapa</button>
-            <button onclick="changeTheme('default')">Siyah Beyaz</button>
-            <button onclick="changeTheme('cyberpunk')">Cyberpunk</button>
-            <button onclick="changeTheme('minecraft')">Minecraft</button>
+            <button onclick="toggleSec()">Saniye</button>
+            <button onclick="setTheme('black')">Siyah</button>
+            <button onclick="setTheme('white')">Beyaz</button>
+            <button onclick="setTheme('cyberpunk')">Cyberpunk</button>
+            <button onclick="setTheme('minecraft')">Minecraft</button>
         </div>
     </div>
 
     <div class="mc-world">
-        <div class="creeper"></div>
-        <div class="tree"></div>
+        <div style="width:40px; height:60px; background:#51a03e; position:absolute; left:10%; bottom:20px; border:3px solid #000;"></div>
+        <div style="width:30px; height:80px; background:#6d4a2c; position:absolute; right:15%; bottom:20px;"></div>
     </div>
 
     <script>
-        function updateTime() {
-            const options = {
-                timeZone: 'Europe/Istanbul',
-                hour: '2-digit', minute: '2-digit', second: '2-digit',
-                hour12: false
-            };
-            const now = new Intl.DateTimeFormat('tr-TR', options).format(new Date());
+        function update() {
+            const now = new Intl.DateTimeFormat('tr-TR', {
+                timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit', second: '2-digit'
+            }).format(new Date());
             const [h, m, s] = now.split(':');
-            
-            // Saati ve dakikayı güncelle (saniye hariç kısmı nodeValue ile değiştiriyoruz ki yapı bozulmasın)
             document.getElementById('clock').childNodes[0].nodeValue = `${h}:${m}`;
             document.getElementById('seconds').innerText = `:${s}`;
         }
 
-        function toggleSec() {
-            document.getElementById('seconds').classList.toggle('hidden');
+        function toggleSec() { document.getElementById('seconds').classList.toggle('hidden'); }
+
+        function setTheme(t) {
+            document.body.className = 'theme-' + t;
         }
 
-        function changeTheme(theme) {
-            const bg = document.getElementById('main-bg');
-            const body = document.body;
-            body.className = ''; // sınıfları temizle
-            
-            if (theme === 'cyberpunk') body.classList.add('cyberpunk-theme');
-            if (theme === 'minecraft') body.classList.add('minecraft-theme');
-        }
-
-        setInterval(updateTime, 1000);
-        updateTime();
+        setInterval(update, 1000);
+        update();
     </script>
 </body>
 </html>
