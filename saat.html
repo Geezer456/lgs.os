@@ -3,115 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LGS.OS | Dinamik Saat</title>
+    <title>LGS.OS | Focus Clock</title>
     <style>
         :root {
             --bg: #000;
             --text: #fff;
-            --accent: #ff8800; /* LGS.OS Ana Turuncusu */
+            --accent: #ff8800;
         }
 
         body, html {
             margin: 0; padding: 0; height: 100%;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', system-ui, sans-serif;
             overflow: hidden;
             background-color: var(--bg);
             color: var(--text);
-            transition: all 0.5s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Ana Taşıyıcı */
+        /* Sol Üst Link */
+        .nav-link {
+            position: absolute; top: 30px; left: 30px;
+            text-decoration: none; color: inherit;
+            font-weight: 800; font-size: 1.2rem;
+            letter-spacing: 2px; transition: 0.3s;
+            z-index: 100; opacity: 0.7;
+        }
+        .nav-link:hover { opacity: 1; transform: translateX(5px); color: var(--accent); }
+
+        /* Ana İçerik Alanı */
         .wrapper {
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
-            height: 100vh; width: 100%; position: relative; z-index: 2;
+            height: 100vh; width: 100%; text-align: center;
         }
 
-        /* Saat Tasarımı */
+        /* Saat ve Tarih */
         #clock {
-            font-size: clamp(5rem, 18vw, 15rem);
-            font-weight: 800; margin: 0;
+            font-size: clamp(5rem, 18vw, 16rem);
+            font-weight: 900; margin: 0;
+            line-height: 0.9;
             display: flex; align-items: baseline;
-            text-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+        #seconds { font-size: 0.35em; margin-left: 10px; opacity: 0.5; font-weight: 400; }
+        
+        #date-display {
+            font-size: clamp(1rem, 3vw, 2.5rem);
+            margin-top: 20px; font-weight: 500;
+            letter-spacing: 1px; opacity: 0.8;
         }
 
-        #seconds { font-size: 0.4em; margin-left: 15px; opacity: 0.6; }
         .hidden { display: none !important; }
 
         /* Butonlar */
-        .controls { margin-top: 50px; display: flex; gap: 15px; z-index: 10; }
+        .controls { margin-top: 60px; display: flex; gap: 12px; }
         
         button {
-            padding: 12px 25px; background: transparent;
+            padding: 12px 28px; background: transparent;
             border: 2px solid var(--text); color: var(--text);
-            cursor: pointer; font-weight: bold; border-radius: 12px;
-            transition: 0.3s; text-transform: uppercase;
+            cursor: pointer; font-weight: bold; border-radius: 50px;
+            transition: 0.3s; text-transform: uppercase; font-size: 0.8rem;
         }
-        button:hover { background: var(--text); color: var(--bg); }
+        button:hover { background: var(--text); color: var(--bg); transform: scale(1.05); }
 
-        /* --- TEMALAR --- */
-        .theme-white { background-color: #ffffff !important; color: #000000 !important; }
-        .theme-white button { border-color: #000; color: #000; }
-        .theme-white button:hover { background: #000; color: #fff; }
-
-        .theme-black { background-color: #000000 !important; color: #ffffff !important; }
+        /* --- ÖZEL TEMALAR --- */
+        .theme-white { background-color: #f5f5f5 !important; color: #111 !important; }
+        .theme-white button { border-color: #111; color: #111; }
+        .theme-white button:hover { background: #111; color: #f5f5f5; }
 
         .theme-cyberpunk { background-color: #050505 !important; color: #0ff !important; }
-        .theme-cyberpunk #clock { text-shadow: 4px 4px #f0f, -2px -2px #0ff; }
-        .theme-cyberpunk button { border-color: #f0f; color: #f0f; }
+        .theme-cyberpunk #clock { text-shadow: 5px 5px #f0f, -2px -2px #0ff; }
+        .theme-cyberpunk #date-display { color: #f0f; text-shadow: 0 0 10px #f0f; }
+        .theme-cyberpunk button { border-color: #f0f; color: #f0f; box-shadow: 0 0 10px rgba(255, 0, 255, 0.2); }
         .theme-cyberpunk button:hover { background: #f0f; color: #000; }
 
-        .theme-minecraft { background-color: #5d81bf !important; color: #fff !important; }
-        .mc-world { display: none; position: absolute; bottom: 0; width: 100%; height: 100px; background: #4a752c; z-index: 1; }
-        .theme-minecraft .mc-world { display: block; }
-
-        /* Geri Dönüş */
-        .nav-home {
-            position: absolute; top: 20px; left: 20px;
-            text-decoration: none; color: inherit; font-size: 14px;
-            font-weight: bold; border: 1px solid; padding: 8px 15px; border-radius: 10px;
+        /* Mobil Ayarı */
+        @media (max-width: 600px) {
+            .controls { flex-direction: column; }
         }
     </style>
 </head>
 <body>
 
-    <a href="index.html" class="nav-home">← ANA SAYFAYA DÖN</a>
+    <a href="index.html" class="nav-link">⚡ LGS.OS</a>
 
-    <div class="wrapper" id="main-layer">
+    <div class="wrapper">
         <div id="clock">00:00<span id="seconds" class="hidden">:00</span></div>
+        
+        <div id="date-display">Yükleniyor...</div>
 
         <div class="controls">
             <button onclick="toggleSec()">Saniye</button>
             <button onclick="setTheme('black')">Siyah</button>
             <button onclick="setTheme('white')">Beyaz</button>
-            <button onclick="setTheme('cyberpunk')">Cyberpunk</button>
-            <button onclick="setTheme('minecraft')">Minecraft</button>
+            <button onclick="setTheme('cyber')">Cyberpunk</button>
         </div>
     </div>
 
-    <div class="mc-world">
-        <div style="width:40px; height:60px; background:#51a03e; position:absolute; left:10%; bottom:20px; border:3px solid #000;"></div>
-        <div style="width:30px; height:80px; background:#6d4a2c; position:absolute; right:15%; bottom:20px;"></div>
-    </div>
-
     <script>
-        function update() {
-            const now = new Intl.DateTimeFormat('tr-TR', {
-                timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit', second: '2-digit'
-            }).format(new Date());
-            const [h, m, s] = now.split(':');
+        function updateAll() {
+            const now = new Date();
+            
+            // İstanbul Saati Ayarları
+            const timeStr = new Intl.DateTimeFormat('tr-TR', {
+                timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+            }).format(now);
+            
+            const [h, m, s] = timeStr.split(':');
             document.getElementById('clock').childNodes[0].nodeValue = `${h}:${m}`;
             document.getElementById('seconds').innerText = `:${s}`;
+
+            // Tarih Ayarı (Örnek: 7 Mart 2026 Çarşamba)
+            const dateStr = new Intl.DateTimeFormat('tr-TR', {
+                timeZone: 'Europe/Istanbul', day: 'numeric', month: 'long', year: 'numeric', weekday: 'long'
+            }).format(now);
+            
+            document.getElementById('date-display').innerText = dateStr;
         }
 
-        function toggleSec() { document.getElementById('seconds').classList.toggle('hidden'); }
+        function toggleSec() {
+            document.getElementById('seconds').classList.toggle('hidden');
+        }
 
         function setTheme(t) {
-            document.body.className = 'theme-' + t;
+            document.body.className = ''; // Hepsini temizle
+            if(t === 'white') document.body.classList.add('theme-white');
+            if(t === 'cyber') document.body.classList.add('theme-cyberpunk');
+            // Black varsayılan olduğu için bir şey eklemeye gerek yok
         }
 
-        setInterval(update, 1000);
-        update();
+        // Başlat
+        setInterval(updateAll, 1000);
+        updateAll();
     </script>
 </body>
 </html>
